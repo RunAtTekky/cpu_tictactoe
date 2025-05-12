@@ -3,12 +3,65 @@ package main
 import (
 	"fmt"
 	"math"
+	"os"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 var EMPTY rune = '$'
 var game_over bool = false
 var board [9]rune
 var x_turn bool = true
+
+type model struct {
+	board_m     [9]rune
+	x_turn_m    bool
+	game_over_m bool
+	pos_row     int
+	pos_col     int
+}
+
+func InitialModel() tea.Model {
+	return model{
+		board_m: [9]rune{
+			'$', '$', '$',
+			'$', '$', '$',
+			'$', '$', '$',
+		},
+		x_turn_m:    true,
+		game_over_m: false,
+		pos_row:     1,
+		pos_col:     1,
+	}
+}
+
+func (m model) Init() tea.Cmd {
+	return nil
+}
+
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "ctrl+c":
+			return m, tea.Quit
+		case "c":
+			return m, tea.ClearScreen
+		}
+
+	}
+
+	return m, nil
+}
+
+func (m model) View() string {
+	s := "Hello welcome to TicTacToe\n"
+	for i := 0; i+2 < 9; i += 3 {
+		s += fmt.Sprintf("%c %c %c\n", m.board_m[i], m.board_m[i+1], m.board_m[i+2])
+	}
+
+	return s
+}
 
 type Move struct {
 	row int
@@ -239,90 +292,97 @@ func is_game_over(board *[9]rune) bool {
 	return true
 }
 
-func main() {
-
-	for i := range board {
-		board[i] = EMPTY
-	}
-
-	turns := 0
-
-	for !game_over {
-
-		var row, col int
-		print_board(&board)
-
-		fmt.Println("Enter row: ")
-		fmt.Scan(&row)
-
-		fmt.Println("Enter col: ")
-		fmt.Scan(&col)
-
-		if !check_valid(row, col) {
-			fmt.Println("Enter in empty cell")
-			continue
-		}
-
-		location := (row-1)*3 - 1 + col
-		if x_turn {
-			board[location] = 'X'
-		} else {
-			board[location] = 'O'
-		}
-
-		x_turn = !x_turn
-
-		game_over = is_game_over(&board)
-		turns++
-
-		if game_over {
-			break
-		}
-
-		ans := minimax(board, x_turn, 0)
-
-		// fmt.Println("Chances of winning: ", ans.score)
-		// fmt.Println("Best Move: ", ans.move.row+1, ans.move.col+1)
-		board[(ans.move.row)*3+ans.move.col] = 'O'
-
-		x_turn = !x_turn
-
-		game_over = is_game_over(&board)
-		// print_board(&board)
-
-		if game_over {
-			break
-		}
-
-		if turns == 9 {
-			break
-		}
-	}
-
-	if !check_winner(&board) {
-		fmt.Println("GAME ENDED IN DRAW")
-	} else if x_turn {
-		fmt.Println("Game Over!!!! O WON")
-	} else {
-		fmt.Println("Game Over!!!! X WON")
-	}
-}
-
 // func main() {
-// 	var board [9]rune = [9]rune{
-// 		// 'O', 'O', '$',
-// 		// 'X', 'X', '$',
-// 		// 'O', 'X', '$',
-// 		// 'O', 'O', '$',
-// 		// 'X', 'O', 'X',
-// 		// '$', 'X', '$',
-// 		'O', 'O', '$',
-// 		'X', 'O', 'X',
-// 		'$', 'X', '$',
+//
+// 	for i := range board {
+// 		board[i] = EMPTY
 // 	}
 //
-// 	ans := minimax(board, false, 0)
+// 	turns := 0
 //
-// 	fmt.Println(ans)
+// 	for !game_over {
 //
+// 		var row, col int
+// 		print_board(&board)
+//
+// 		fmt.Println("Enter row: ")
+// 		fmt.Scan(&row)
+//
+// 		fmt.Println("Enter col: ")
+// 		fmt.Scan(&col)
+//
+// 		if !check_valid(row, col) {
+// 			fmt.Println("Enter in empty cell")
+// 			continue
+// 		}
+//
+// 		location := (row-1)*3 - 1 + col
+// 		if x_turn {
+// 			board[location] = 'X'
+// 		} else {
+// 			board[location] = 'O'
+// 		}
+//
+// 		x_turn = !x_turn
+//
+// 		game_over = is_game_over(&board)
+// 		turns++
+//
+// 		if game_over {
+// 			break
+// 		}
+//
+// 		ans := minimax(board, x_turn, 0)
+//
+// 		// fmt.Println("Chances of winning: ", ans.score)
+// 		// fmt.Println("Best Move: ", ans.move.row+1, ans.move.col+1)
+// 		board[(ans.move.row)*3+ans.move.col] = 'O'
+//
+// 		x_turn = !x_turn
+//
+// 		game_over = is_game_over(&board)
+// 		// print_board(&board)
+//
+// 		if game_over {
+// 			break
+// 		}
+//
+// 		if turns == 9 {
+// 			break
+// 		}
+// 	}
+//
+// 	if !check_winner(&board) {
+// 		fmt.Println("GAME ENDED IN DRAW")
+// 	} else if x_turn {
+// 		fmt.Println("Game Over!!!! O WON")
+// 	} else {
+// 		fmt.Println("Game Over!!!! X WON")
+// 	}
 // }
+
+func main() {
+	// var board [9]rune = [9]rune{
+	// 	// 'O', 'O', '$',
+	// 	// 'X', 'X', '$',
+	// 	// 'O', 'X', '$',
+	// 	// 'O', 'O', '$',
+	// 	// 'X', 'O', 'X',
+	// 	// '$', 'X', '$',
+	// 	'O', 'O', '$',
+	// 	'X', 'O', 'X',
+	// 	'$', 'X', '$',
+	// }
+	//
+	// ans := minimax(board, false, 0)
+	//
+	// fmt.Println(ans)
+
+	p := tea.NewProgram(InitialModel())
+
+	if _, err := p.Run(); err != nil {
+		fmt.Printf("There was an error %v", err)
+		os.Exit(1)
+	}
+
+}
