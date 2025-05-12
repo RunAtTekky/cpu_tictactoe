@@ -20,28 +20,28 @@ func minimax(board [9]rune) int {
 		return score(&board)
 	}
 	var moves []Move
-	var score []int
+	var scores []int
 
 	// Go through all the possible moves
 	available_moves := get_available_moves(&board)
 
 	for _, move := range available_moves {
 		possible_game := get_new_state(&board, move)
-		score = append(score, minimax(possible_game))
+		scores = append(scores, minimax(possible_game))
 		// minimax(possible_game)
 		moves = append(moves, move)
 	}
 
 	if x_turn {
 		maxi := math.MinInt
-		for _, val := range score {
+		for _, val := range scores {
 			maxi = max(maxi, val)
 		}
 
 		return maxi
 	} else {
 		mini := math.MaxInt
-		for _, val := range score {
+		for _, val := range scores {
 			mini = min(mini, val)
 		}
 
@@ -73,7 +73,7 @@ func get_available_moves(board *[9]rune) []Move {
 	var moves []Move
 
 	for i, char := range board {
-		if char == '$' {
+		if char == EMPTY {
 			var new_move Move
 			new_move.row = i / 3
 			new_move.col = i % 3
@@ -86,6 +86,7 @@ func get_available_moves(board *[9]rune) []Move {
 }
 
 func score(board *[9]rune) int {
+	// Horizontal
 	for i := 0; i+2 < 9; i += 3 {
 		if board[i] != EMPTY && board[i] == board[i+1] && board[i] == board[i+2] {
 			if board[i] == 'X' {
@@ -123,7 +124,8 @@ func score(board *[9]rune) int {
 		}
 	}
 
-	return 1
+	// It must be draw
+	return 0
 }
 
 func check_winner(board *[9]rune) bool {
@@ -178,7 +180,7 @@ func print_board(board *[9]rune) {
 func main() {
 
 	for i := range board {
-		board[i] = '$'
+		board[i] = EMPTY
 	}
 
 	turns := 0
