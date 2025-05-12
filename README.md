@@ -27,6 +27,7 @@ So let's say we have three choices
 - No victory (Opponent wins next turn)
 - No victory (Opponent wins next turn)
 
+```go
 func heuristic() {
     if game_won_by_player {
         return 1
@@ -38,4 +39,5 @@ func heuristic() {
         return 0
     }
 }
+```
 

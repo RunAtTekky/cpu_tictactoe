@@ -37,15 +37,15 @@ func minimax(board [9]rune, is_x_turn bool, depth int) BestMove {
 	// Go through all the possible moves
 	available_moves := get_available_moves(&board)
 
-	fmt.Println(available_moves)
+	// fmt.Println(available_moves)
 
 	for _, move := range available_moves {
 		possible_game := get_new_state(&board, move, is_x_turn)
-		fmt.Println("MOVE ", move)
-		print_board(&possible_game)
+		// fmt.Println("MOVE ", move)
+		// print_board(&possible_game)
 		// evaluation := minimax(possible_game, !is_x_turn, depth)
 		scores = append(scores, minimax(possible_game, !is_x_turn, depth).score)
-		fmt.Println(scores[len(scores)-1])
+		// fmt.Println(scores[len(scores)-1])
 		// minimax(possible_game)
 		moves = append(moves, move)
 	}
