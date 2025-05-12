@@ -21,6 +21,12 @@ type BestMove struct {
 }
 
 func minimax(board [9]rune, is_x_turn bool, depth int) BestMove {
+	if depth == 8 {
+		return BestMove{
+			score: 0,
+			move:  Move{},
+		}
+	}
 	if check_winner(&board) {
 		return BestMove{
 			score: score(&board, depth),
@@ -37,15 +43,15 @@ func minimax(board [9]rune, is_x_turn bool, depth int) BestMove {
 	// Go through all the possible moves
 	available_moves := get_available_moves(&board)
 
-	// fmt.Println(available_moves)
+	fmt.Println(available_moves)
 
 	for _, move := range available_moves {
 		possible_game := get_new_state(&board, move, is_x_turn)
-		// fmt.Println("MOVE ", move)
-		// print_board(&possible_game)
+		fmt.Println("MOVE ", move)
+		print_board(&possible_game)
 		// evaluation := minimax(possible_game, !is_x_turn, depth)
 		scores = append(scores, minimax(possible_game, !is_x_turn, depth).score)
-		// fmt.Println(scores[len(scores)-1])
+		fmt.Println("Score: ", scores[len(scores)-1])
 		// minimax(possible_game)
 		moves = append(moves, move)
 	}
@@ -62,6 +68,12 @@ func minimax(board [9]rune, is_x_turn bool, depth int) BestMove {
 				best_move.move.col = moves[i].col
 			}
 		}
+		if best_move.score == math.MinInt {
+			return BestMove{
+				score: 0,
+				move:  Move{},
+			}
+		}
 
 		return best_move
 	} else {
@@ -74,6 +86,12 @@ func minimax(board [9]rune, is_x_turn bool, depth int) BestMove {
 				best_move.score = val
 				best_move.move.row = moves[i].row
 				best_move.move.col = moves[i].col
+			}
+		}
+		if best_move.score == math.MaxInt {
+			return BestMove{
+				score: 0,
+				move:  Move{},
 			}
 		}
 		return best_move
@@ -208,6 +226,19 @@ func print_board(board *[9]rune) {
 	}
 }
 
+func is_game_over(board *[9]rune) bool {
+	if check_winner(board) {
+		return true
+	}
+
+	for _, val := range board {
+		if val == EMPTY {
+			return false
+		}
+	}
+	return true
+}
+
 func main() {
 
 	for i := range board {
@@ -241,7 +272,7 @@ func main() {
 
 		x_turn = !x_turn
 
-		game_over = check_winner(&board)
+		game_over = is_game_over(&board)
 		turns++
 
 		if game_over {
@@ -256,7 +287,7 @@ func main() {
 
 		x_turn = !x_turn
 
-		game_over = check_winner(&board)
+		game_over = is_game_over(&board)
 		// print_board(&board)
 
 		if game_over {
