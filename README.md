@@ -1,39 +1,57 @@
-## Algorithm
-We want to create an algorithm to give us the best move after user moves
+# CPU TicTacToe
+Well well well, I have made the two player TicTacToe game many times. It is very easy, you only a little bit of logic to create a TWO player TicTacToe game.
 
-We need to purge other choices.
+But when it comes to creating a TicTacToe when the computer will be making the moves, it becomes exponentially difficult.
 
-We can use minimax.
+## What we want?
+Make the CPU unbeatable.
 
-Kind of like chess evaluation. +val means White winning, -val means Black winning and 0 means draw.
+After user makes a move, CPU should respond with the best possible move.
 
-So we need to have a heuristic function which tells us the value of current state.
+For this we will be using [minimax](https://en.wikipedia.org/wiki/Minimax)
 
+### Minimax
+Kind of like chess evaluation.
+- +val means White winning
+- -val means Black winning
+- 0 means draw.
+
+We have current game state.
+
+We have many possible move choice, each choice will give us a score.
+
+This score is like the evaluation.
+
+So we need to have a heuristic function which gives us the evaluation.
+
+### Game State
 If we can play a move and win the game.
-Then the heuristic function should give value 1.
+Then the heuristic function should give value 10.
 
 If opponent can play a move and win the game.
-Then the heuristic function should give value -1.
-
-Probably like take the average????
-NOOOOO!!!!!!!
+Then the heuristic function should give value -10.
 
 We should take the maximum.
 
 The Opponent should take the minimum.
 
-So let's say we have three choices
-- Leads to victory
-- No victory (Opponent wins next turn)
-- No victory (Opponent wins next turn)
+So let's say we have three move choices and these are the following scores for those
+- 10 Leads to victory in just one move
+- -10 Leads to loss in one move
+- 0 Leads to draw in one move
+
+We obviously want to win, so we will take the maximum. On the contrary, our opponent will choose the minimum.
+
+### Code
+This is an example of what our heuristic function looks like, we are also using depth in real code, so that the CPU prolongs the losing position, keep in mind that CPU itself will never arrive at a losing position so we will have to give it a losing position.
 
 ```go
 func heuristic() {
     if game_won_by_player {
-        return 1
+        return 10
     }
     else if game_won_by_opponent {
-        return -1
+        return -10
     }
     else {
         return 0
