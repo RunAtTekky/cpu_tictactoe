@@ -15,24 +15,30 @@ type Move struct {
 	col int
 }
 
-func minimax(board [9]rune) int {
+func minimax(board [9]rune, is_x_turn bool, depth int) int {
 	if check_winner(&board) {
-		return score(&board)
+		return score(&board, depth)
 	}
+	depth++
 	var moves []Move
 	var scores []int
 
 	// Go through all the possible moves
 	available_moves := get_available_moves(&board)
 
+	fmt.Println(available_moves)
+
 	for _, move := range available_moves {
-		possible_game := get_new_state(&board, move)
-		scores = append(scores, minimax(possible_game))
+		possible_game := get_new_state(&board, move, is_x_turn)
+		fmt.Println("MOVE ", move)
+		print_board(&possible_game)
+		scores = append(scores, minimax(possible_game, !is_x_turn, depth))
+		fmt.Println(scores[len(scores)-1])
 		// minimax(possible_game)
 		moves = append(moves, move)
 	}
 
-	if x_turn {
+	if is_x_turn {
 		maxi := math.MinInt
 		for _, val := range scores {
 			maxi = max(maxi, val)
@@ -49,7 +55,7 @@ func minimax(board [9]rune) int {
 	}
 }
 
-func get_new_state(board *[9]rune, move Move) [9]rune {
+func get_new_state(board *[9]rune, move Move, is_x_turn bool) [9]rune {
 	var new_state [9]rune
 
 	for i, val := range board {
@@ -60,7 +66,7 @@ func get_new_state(board *[9]rune, move Move) [9]rune {
 	col := move.col
 	location := row*3 + col
 
-	if x_turn {
+	if is_x_turn {
 		new_state[location] = 'X'
 	} else {
 		new_state[location] = 'O'
@@ -85,14 +91,14 @@ func get_available_moves(board *[9]rune) []Move {
 	return moves
 }
 
-func score(board *[9]rune) int {
+func score(board *[9]rune, depth int) int {
 	// Horizontal
 	for i := 0; i+2 < 9; i += 3 {
 		if board[i] != EMPTY && board[i] == board[i+1] && board[i] == board[i+2] {
 			if board[i] == 'X' {
-				return 1
+				return 10 - depth
 			} else {
-				return -1
+				return depth - 10
 			}
 		}
 	}
@@ -101,9 +107,9 @@ func score(board *[9]rune) int {
 	for i := 0; i < 3; i++ {
 		if board[i] != EMPTY && board[i] == board[i+3] && board[i] == board[i+6] {
 			if board[i] == 'X' {
-				return 1
+				return 10 - depth
 			} else {
-				return -1
+				return depth - 10
 			}
 		}
 	}
@@ -111,16 +117,16 @@ func score(board *[9]rune) int {
 	// Diagonal
 	if board[4] != EMPTY && board[0] == board[4] && board[4] == board[8] {
 		if board[4] == 'X' {
-			return 1
+			return 10 - depth
 		} else {
-			return -1
+			return depth - 10
 		}
 	}
 	if board[4] != EMPTY && board[2] == board[4] && board[4] == board[6] {
 		if board[4] == 'X' {
-			return 1
+			return 10 - depth
 		} else {
-			return -1
+			return depth - 10
 		}
 	}
 
@@ -213,6 +219,10 @@ func main() {
 		game_over = check_winner(&board)
 		turns++
 
+		ans := minimax(board, x_turn, 0)
+
+		fmt.Println("Chances of winning: ", ans)
+
 		if turns == 9 {
 			break
 		}
@@ -226,3 +236,22 @@ func main() {
 		fmt.Println("Game Over!!!! X WON")
 	}
 }
+
+// func main() {
+// 	var board [9]rune = [9]rune{
+// 		// 'O', 'O', '$',
+// 		// 'X', 'X', '$',
+// 		// 'O', 'X', '$',
+// 		// 'O', 'O', '$',
+// 		// 'X', 'O', 'X',
+// 		// '$', 'X', '$',
+// 		'O', 'O', '$',
+// 		'X', 'O', 'X',
+// 		'$', 'X', '$',
+// 	}
+//
+// 	ans := minimax(board, false, 0)
+//
+// 	fmt.Println(ans)
+//
+// }
