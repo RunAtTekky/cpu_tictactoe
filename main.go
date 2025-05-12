@@ -15,9 +15,20 @@ type Move struct {
 	col int
 }
 
-func minimax(board [9]rune, is_x_turn bool, depth int) int {
+type BestMove struct {
+	move  Move
+	score int
+}
+
+func minimax(board [9]rune, is_x_turn bool, depth int) BestMove {
 	if check_winner(&board) {
-		return score(&board, depth)
+		return BestMove{
+			score: score(&board, depth),
+			move: Move{
+				row: -1,
+				col: -1,
+			},
+		}
 	}
 	depth++
 	var moves []Move
@@ -32,26 +43,40 @@ func minimax(board [9]rune, is_x_turn bool, depth int) int {
 		possible_game := get_new_state(&board, move, is_x_turn)
 		fmt.Println("MOVE ", move)
 		print_board(&possible_game)
-		scores = append(scores, minimax(possible_game, !is_x_turn, depth))
+		// evaluation := minimax(possible_game, !is_x_turn, depth)
+		scores = append(scores, minimax(possible_game, !is_x_turn, depth).score)
 		fmt.Println(scores[len(scores)-1])
 		// minimax(possible_game)
 		moves = append(moves, move)
 	}
 
 	if is_x_turn {
-		maxi := math.MinInt
-		for _, val := range scores {
-			maxi = max(maxi, val)
+		best_move := BestMove{
+			score: math.MinInt,
+			move:  Move{},
+		}
+		for i, val := range scores {
+			if val > best_move.score {
+				best_move.score = val
+				best_move.move.row = moves[i].row
+				best_move.move.col = moves[i].col
+			}
 		}
 
-		return maxi
+		return best_move
 	} else {
-		mini := math.MaxInt
-		for _, val := range scores {
-			mini = min(mini, val)
+		best_move := BestMove{
+			score: math.MaxInt,
+			move:  Move{},
 		}
-
-		return mini
+		for i, val := range scores {
+			if val < best_move.score {
+				best_move.score = val
+				best_move.move.row = moves[i].row
+				best_move.move.col = moves[i].col
+			}
+		}
+		return best_move
 	}
 }
 
@@ -221,7 +246,8 @@ func main() {
 
 		ans := minimax(board, x_turn, 0)
 
-		fmt.Println("Chances of winning: ", ans)
+		fmt.Println("Chances of winning: ", ans.score)
+		fmt.Println("Best Move: ", ans.move.row+1, ans.move.col+1)
 
 		if turns == 9 {
 			break
