@@ -244,10 +244,24 @@ func main() {
 		game_over = check_winner(&board)
 		turns++
 
+		if game_over {
+			break
+		}
+
 		ans := minimax(board, x_turn, 0)
 
 		fmt.Println("Chances of winning: ", ans.score)
 		fmt.Println("Best Move: ", ans.move.row+1, ans.move.col+1)
+		board[(ans.move.row)*3+ans.move.col] = 'O'
+
+		x_turn = !x_turn
+
+		game_over = check_winner(&board)
+		// print_board(&board)
+
+		if game_over {
+			break
+		}
 
 		if turns == 9 {
 			break
