@@ -6,6 +6,7 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var EMPTY rune = '$'
@@ -14,26 +15,31 @@ var board [9]rune
 var x_turn bool = true
 
 type model struct {
-	board_m     [9]rune
+	board       [3][3]rune
 	x_turn_m    bool
 	game_over_m bool
-	pos_row     int
-	pos_col     int
+	cursorX     int
+	cursorY     int
 }
 
 func InitialModel() tea.Model {
 	return model{
-		board_m: [9]rune{
-			'$', '$', '$',
-			'$', '$', '$',
-			'$', '$', '$',
+		board: [3][3]rune{
+			{'$', '$', '$'},
+			{'$', '$', '$'},
+			{'$', '$', '$'},
 		},
 		x_turn_m:    true,
 		game_over_m: false,
-		pos_row:     1,
-		pos_col:     1,
+		cursorX:     1,
+		cursorY:     1,
 	}
 }
+
+var (
+	cellStyle       = lipgloss.NewStyle().Width(5).Height(3).Align(lipgloss.Center, lipgloss.Center).Border(lipgloss.NormalBorder())
+	cursorCellStyle = cellStyle.Copy().BorderForeground(lipgloss.Color("205")).Bold(true)
+)
 
 func (m model) Init() tea.Cmd {
 	return nil
@@ -43,24 +49,57 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c":
+		case "ctrl+c", "q":
 			return m, tea.Quit
 		case "c":
 			return m, tea.ClearScreen
+
+		case "up", "k":
+			if m.cursorY > 0 {
+				m.cursorY--
+			}
+		case "down", "j":
+			if m.cursorY < 2 {
+				m.cursorY++
+			}
+		case "left", "h":
+			if m.cursorX > 0 {
+				m.cursorX--
+			}
+		case "right", "l":
+			if m.cursorX < 2 {
+				m.cursorX++
+			}
 		}
-
 	}
-
 	return m, nil
+
 }
 
 func (m model) View() string {
-	s := "Hello welcome to TicTacToe\n"
-	for i := 0; i+2 < 9; i += 3 {
-		s += fmt.Sprintf("%c %c %c\n", m.board_m[i], m.board_m[i+1], m.board_m[i+2])
+	rows := make([]string, 3)
+
+	for y := 0; y < 3; y++ {
+		cells := make([]string, 3)
+		for x := 0; x < 3; x++ {
+			cell := ' '
+			if m.board[y][x] != 0 {
+				cell = m.board[y][x]
+			}
+			style := cellStyle
+			if x == m.cursorX && y == m.cursorY {
+				style = cursorCellStyle
+			}
+			cells[x] = style.Render(string(cell))
+		}
+		// Join all cells in a row horizontally
+		rows[y] = lipgloss.JoinHorizontal(lipgloss.Top, cells...)
 	}
 
-	return s
+	// Join all rows vertically
+	grid := lipgloss.JoinVertical(lipgloss.Left, rows...)
+
+	return grid + "\n\nUse VIM Bindings to move. Press q to quit."
 }
 
 type Move struct {
