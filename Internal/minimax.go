@@ -10,86 +10,86 @@ var board [3][3]rune
 var x_turn bool = true
 
 type Move struct {
-	row int
-	col int
+	Row int
+	Col int
 }
 
 type BestMove struct {
-	move  Move
-	score int
+	Move  Move
+	Score int
 }
 
 func Minimax(board [3][3]rune, is_x_turn bool, depth int) BestMove {
 	if depth == 8 {
 		return BestMove{
-			score: 0,
-			move:  Move{},
+			Score: 0,
+			Move:  Move{},
 		}
 	}
 	if check_winner(&board) {
 		return BestMove{
-			score: score(&board, depth),
-			move:  Move{},
+			Score: Score(&board, depth),
+			Move:  Move{},
 		}
 	}
 	depth++
-	var moves []Move
-	var scores []int
+	var Moves []Move
+	var Scores []int
 
-	// Go through all the possible moves
-	available_moves := get_available_moves(&board)
+	// Go through all the possible Moves
+	available_Moves := get_available_Moves(&board)
 
-	// fmt.Println(available_moves)
+	// fmt.Println(available_Moves)
 
-	for _, move := range available_moves {
-		possible_game := get_new_state(&board, move, is_x_turn)
-		scores = append(scores, Minimax(possible_game, !is_x_turn, depth).score)
-		moves = append(moves, move)
+	for _, Move := range available_Moves {
+		possible_game := get_new_state(&board, Move, is_x_turn)
+		Scores = append(Scores, Minimax(possible_game, !is_x_turn, depth).Score)
+		Moves = append(Moves, Move)
 	}
 
 	if is_x_turn {
-		best_move := BestMove{
-			score: math.MinInt,
-			move:  Move{},
+		best_Move := BestMove{
+			Score: math.MinInt,
+			Move:  Move{},
 		}
-		for i, val := range scores {
-			if val > best_move.score {
-				best_move.score = val
-				best_move.move.row = moves[i].row
-				best_move.move.col = moves[i].col
+		for i, val := range Scores {
+			if val > best_Move.Score {
+				best_Move.Score = val
+				best_Move.Move.Row = Moves[i].Row
+				best_Move.Move.Col = Moves[i].Col
 			}
 		}
-		if best_move.score == math.MinInt {
+		if best_Move.Score == math.MinInt {
 			return BestMove{
-				score: 0,
-				move:  Move{},
+				Score: 0,
+				Move:  Move{},
 			}
 		}
 
-		return best_move
+		return best_Move
 	} else {
-		best_move := BestMove{
-			score: math.MaxInt,
-			move:  Move{},
+		best_Move := BestMove{
+			Score: math.MaxInt,
+			Move:  Move{},
 		}
-		for i, val := range scores {
-			if val < best_move.score {
-				best_move.score = val
-				best_move.move.row = moves[i].row
-				best_move.move.col = moves[i].col
+		for i, val := range Scores {
+			if val < best_Move.Score {
+				best_Move.Score = val
+				best_Move.Move.Row = Moves[i].Row
+				best_Move.Move.Col = Moves[i].Col
 			}
 		}
-		if best_move.score == math.MaxInt {
+		if best_Move.Score == math.MaxInt {
 			return BestMove{
-				score: 0,
-				move:  Move{},
+				Score: 0,
+				Move:  Move{},
 			}
 		}
-		return best_move
+		return best_Move
 	}
 }
 
-func get_new_state(board *[3][3]rune, move Move, is_x_turn bool) [3][3]rune {
+func get_new_state(board *[3][3]rune, Move Move, is_x_turn bool) [3][3]rune {
 	var new_state [3][3]rune
 
 	for i, val := range board {
@@ -97,33 +97,33 @@ func get_new_state(board *[3][3]rune, move Move, is_x_turn bool) [3][3]rune {
 	}
 
 	if is_x_turn {
-		new_state[move.row][move.col] = 'X'
+		new_state[Move.Row][Move.Col] = 'X'
 	} else {
-		new_state[move.row][move.col] = 'O'
+		new_state[Move.Row][Move.Col] = 'O'
 	}
 
 	return new_state
 }
 
-func get_available_moves(board *[3][3]rune) []Move {
-	var moves []Move
+func get_available_Moves(board *[3][3]rune) []Move {
+	var Moves []Move
 
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			if board[i][j] == EMPTY {
-				var new_move Move = Move{
-					row: i,
-					col: j,
+				var new_Move Move = Move{
+					Row: i,
+					Col: j,
 				}
-				moves = append(moves, new_move)
+				Moves = append(Moves, new_Move)
 			}
 		}
 	}
 
-	return moves
+	return Moves
 }
 
-func score(board *[3][3]rune, depth int) int {
+func Score(board *[3][3]rune, depth int) int {
 	// Horizontal
 	for i := 0; i < 3; i++ {
 		if board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
@@ -193,14 +193,14 @@ func check_winner(board *[3][3]rune) bool {
 
 }
 
-func check_valid(row int, col int) bool {
-	if row < 1 || row > 3 {
+func check_valid(Row int, Col int) bool {
+	if Row < 1 || Row > 3 {
 		return false
 	}
-	if col < 1 || col > 3 {
+	if Col < 1 || Col > 3 {
 		return false
 	}
-	if board[row-1][col-1] != EMPTY {
+	if board[Row-1][Col-1] != EMPTY {
 		return false
 	}
 

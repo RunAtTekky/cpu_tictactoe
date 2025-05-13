@@ -24,11 +24,20 @@ COL: %d
 TURN: %t
 `, req.Row, req.Col, req.X_turn)
 
+	models.Board_IN_use.Print_Board()
+	if !models.Board_IN_use.Insert(req.Row, req.Col, req.X_turn) {
+		fmt.Fprintf(w, "FAILED! Already present!\n")
+		return
+	}
+
 	fmt.Fprintf(w, "Success!\n")
+	models.Board_IN_use.Print_Board()
 
 	board := models.Board_IN_use
 
 	best_move := internal.Minimax(board.Board, board.X_turn, board.Depth)
 	fmt.Println(best_move)
 
+	models.Board_IN_use.Insert(best_move.Move.Row, best_move.Move.Col, board.X_turn)
+	models.Board_IN_use.Print_Board()
 }
