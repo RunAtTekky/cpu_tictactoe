@@ -54,6 +54,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "c":
 			return m, tea.ClearScreen
+		case "r":
+			restart_game(&m)
+			return m, tea.ClearScreen
 		case "x":
 			make_move(&m)
 			return m, tea.ClearScreen
@@ -81,6 +84,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	if m.game_over_m {
+		if !check_winner(&m.board) {
+			return "DRAW"
+		}
+
+		s := "GAME OVER\n"
+		if m.x_turn_m {
+			s += "X WON!"
+		} else {
+			s += "O WON!"
+		}
+		return s
+	}
+
 	rows := make([]string, 3)
 
 	for y := 0; y < 3; y++ {
@@ -106,7 +123,7 @@ func (m model) View() string {
 	// Join all rows vertically
 	grid := lipgloss.JoinVertical(lipgloss.Left, rows...)
 
-	return grid + "\n\nUse VIM Bindings to move. Press q to quit."
+	return grid + "\n\nUse VIM Bindings to move. Press q to quit. Press r to restart"
 }
 
 type Move struct {
@@ -119,11 +136,40 @@ type BestMove struct {
 	score int
 }
 
+func restart_game(m *model) {
+	m.board = [3][3]rune{
+		{'$', '$', '$'},
+		{'$', '$', '$'},
+		{'$', '$', '$'},
+	}
+	m.x_turn_m = !m.x_turn_m
+	if !m.x_turn_m {
+		best_move := minimax(m.board, m.x_turn_m, m.depth)
+		if m.x_turn_m {
+			m.board[best_move.move.row][best_move.move.col] = 'X'
+		} else {
+			m.board[best_move.move.row][best_move.move.col] = 'O'
+		}
+		m.x_turn_m = !m.x_turn_m
+	}
+	m.game_over_m = false
+	m.cursorX = 1
+	m.cursorY = 1
+}
+
 func make_move(m *model) {
+	if m.board[m.cursorY][m.cursorX] != EMPTY {
+		return
+	}
 	if m.x_turn_m {
 		m.board[m.cursorY][m.cursorX] = 'X'
 	} else {
 		m.board[m.cursorY][m.cursorX] = 'O'
+	}
+
+	if is_game_over(&m.board) {
+		m.game_over_m = true
+		return
 	}
 
 	m.x_turn_m = !m.x_turn_m
@@ -133,6 +179,10 @@ func make_move(m *model) {
 		m.board[best_move.move.row][best_move.move.col] = 'X'
 	} else {
 		m.board[best_move.move.row][best_move.move.col] = 'O'
+	}
+	if is_game_over(&m.board) {
+		m.game_over_m = true
+		return
 	}
 	m.x_turn_m = !m.x_turn_m
 }
@@ -161,12 +211,7 @@ func minimax(board [3][3]rune, is_x_turn bool, depth int) BestMove {
 
 	for _, move := range available_moves {
 		possible_game := get_new_state(&board, move, is_x_turn)
-		// fmt.Println("MOVE ", move)
-		// print_board(&possible_game)
-		// evaluation := minimax(possible_game, !is_x_turn, depth)
 		scores = append(scores, minimax(possible_game, !is_x_turn, depth).score)
-		// fmt.Println("Score: ", scores[len(scores)-1])
-		// minimax(possible_game)
 		moves = append(moves, move)
 	}
 
@@ -330,12 +375,6 @@ func check_valid(row int, col int) bool {
 	return true
 }
 
-// func print_board(board *[3][3]rune) {
-// 	for i := 0; i < 3; i++ {
-// 		fmt.Printf("%c %c %c\n", board[i], board[i+1], board[i+2])
-// 	}
-// }
-
 func is_game_over(board *[3][3]rune) bool {
 	if check_winner(board) {
 		return true
@@ -352,91 +391,7 @@ func is_game_over(board *[3][3]rune) bool {
 	return true
 }
 
-// func main() {
-//
-// 	for i := range board {
-// 		board[i] = EMPTY
-// 	}
-//
-// 	turns := 0
-//
-// 	for !game_over {
-//
-// 		var row, col int
-// 		print_board(&board)
-//
-// 		fmt.Println("Enter row: ")
-// 		fmt.Scan(&row)
-//
-// 		fmt.Println("Enter col: ")
-// 		fmt.Scan(&col)
-//
-// 		if !check_valid(row, col) {
-// 			fmt.Println("Enter in empty cell")
-// 			continue
-// 		}
-//
-// 		location := (row-1)*3 - 1 + col
-// 		if x_turn {
-// 			board[location] = 'X'
-// 		} else {
-// 			board[location] = 'O'
-// 		}
-//
-// 		x_turn = !x_turn
-//
-// 		game_over = is_game_over(&board)
-// 		turns++
-//
-// 		if game_over {
-// 			break
-// 		}
-//
-// 		ans := minimax(board, x_turn, 0)
-//
-// 		// fmt.Println("Chances of winning: ", ans.score)
-// 		// fmt.Println("Best Move: ", ans.move.row+1, ans.move.col+1)
-// 		board[(ans.move.row)*3+ans.move.col] = 'O'
-//
-// 		x_turn = !x_turn
-//
-// 		game_over = is_game_over(&board)
-// 		// print_board(&board)
-//
-// 		if game_over {
-// 			break
-// 		}
-//
-// 		if turns == 9 {
-// 			break
-// 		}
-// 	}
-//
-// 	if !check_winner(&board) {
-// 		fmt.Println("GAME ENDED IN DRAW")
-// 	} else if x_turn {
-// 		fmt.Println("Game Over!!!! O WON")
-// 	} else {
-// 		fmt.Println("Game Over!!!! X WON")
-// 	}
-// }
-
 func main() {
-	// var board [3][3]rune = [3][3]rune{
-	// 	// 'O', 'O', '$',
-	// 	// 'X', 'X', '$',
-	// 	// 'O', 'X', '$',
-	// 	// 'O', 'O', '$',
-	// 	// 'X', 'O', 'X',
-	// 	// '$', 'X', '$',
-	// 	'O', 'O', '$',
-	// 	'X', 'O', 'X',
-	// 	'$', 'X', '$',
-	// }
-	//
-	// ans := minimax(board, false, 0)
-	//
-	// fmt.Println(ans)
 
 	p := tea.NewProgram(InitialModel())
 
