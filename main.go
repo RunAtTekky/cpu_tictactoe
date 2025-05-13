@@ -43,7 +43,7 @@ var (
 )
 
 func (m model) Init() tea.Cmd {
-	return nil
+	return tea.ClearScreen
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -91,6 +91,9 @@ func (m model) View() string {
 				cell = m.board[y][x]
 			}
 			style := cellStyle
+			if cell == 'O' {
+				style = style.Foreground(lipgloss.Color("34"))
+			}
 			if x == m.cursorX && y == m.cursorY {
 				style = cursorCellStyle
 			}
