@@ -1,7 +1,7 @@
 # CPU TicTacToe
-Well well well, I have made the two player TicTacToe game many times. It is very easy, you only a little bit of logic to create a TWO player TicTacToe game.
+Well well well, I have made the two player TicTacToe game many times. It is very easy, you only need a little bit of logic to create TWO player TicTacToe game.
 
-But when it comes to creating a TicTacToe when the computer will be making the moves, it becomes exponentially difficult.
+But when it comes to creating TicTacToe game when the computer will be making the moves, it becomes exponentially difficult.
 
 ## What we want?
 Make the CPU unbeatable.
