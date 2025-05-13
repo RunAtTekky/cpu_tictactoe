@@ -11,7 +11,7 @@ import (
 
 var EMPTY rune = '$'
 var game_over bool = false
-var board [9]rune
+var board [3][3]rune
 var x_turn bool = true
 
 type model struct {
@@ -20,6 +20,7 @@ type model struct {
 	game_over_m bool
 	cursorX     int
 	cursorY     int
+	depth       int
 }
 
 func InitialModel() tea.Model {
@@ -52,6 +53,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 		case "c":
+			return m, tea.ClearScreen
+		case "x":
+			make_move(&m)
 			return m, tea.ClearScreen
 
 		case "up", "k":
@@ -112,7 +116,25 @@ type BestMove struct {
 	score int
 }
 
-func minimax(board [9]rune, is_x_turn bool, depth int) BestMove {
+func make_move(m *model) {
+	if m.x_turn_m {
+		m.board[m.cursorY][m.cursorX] = 'X'
+	} else {
+		m.board[m.cursorY][m.cursorX] = 'O'
+	}
+
+	m.x_turn_m = !m.x_turn_m
+
+	best_move := minimax(m.board, m.x_turn_m, m.depth)
+	if m.x_turn_m {
+		m.board[best_move.move.row][best_move.move.col] = 'X'
+	} else {
+		m.board[best_move.move.row][best_move.move.col] = 'O'
+	}
+	m.x_turn_m = !m.x_turn_m
+}
+
+func minimax(board [3][3]rune, is_x_turn bool, depth int) BestMove {
 	if depth == 8 {
 		return BestMove{
 			score: 0,
@@ -122,10 +144,7 @@ func minimax(board [9]rune, is_x_turn bool, depth int) BestMove {
 	if check_winner(&board) {
 		return BestMove{
 			score: score(&board, depth),
-			move: Move{
-				row: -1,
-				col: -1,
-			},
+			move:  Move{},
 		}
 	}
 	depth++
@@ -190,47 +209,45 @@ func minimax(board [9]rune, is_x_turn bool, depth int) BestMove {
 	}
 }
 
-func get_new_state(board *[9]rune, move Move, is_x_turn bool) [9]rune {
-	var new_state [9]rune
+func get_new_state(board *[3][3]rune, move Move, is_x_turn bool) [3][3]rune {
+	var new_state [3][3]rune
 
 	for i, val := range board {
 		new_state[i] = val
 	}
 
-	row := move.row
-	col := move.col
-	location := row*3 + col
-
 	if is_x_turn {
-		new_state[location] = 'X'
+		new_state[move.row][move.col] = 'X'
 	} else {
-		new_state[location] = 'O'
+		new_state[move.row][move.col] = 'O'
 	}
 
 	return new_state
 }
 
-func get_available_moves(board *[9]rune) []Move {
+func get_available_moves(board *[3][3]rune) []Move {
 	var moves []Move
 
-	for i, char := range board {
-		if char == EMPTY {
-			var new_move Move
-			new_move.row = i / 3
-			new_move.col = i % 3
-
-			moves = append(moves, new_move)
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			if board[i][j] == EMPTY {
+				var new_move Move = Move{
+					row: i,
+					col: j,
+				}
+				moves = append(moves, new_move)
+			}
 		}
 	}
 
 	return moves
 }
 
-func score(board *[9]rune, depth int) int {
+func score(board *[3][3]rune, depth int) int {
 	// Horizontal
-	for i := 0; i+2 < 9; i += 3 {
-		if board[i] != EMPTY && board[i] == board[i+1] && board[i] == board[i+2] {
-			if board[i] == 'X' {
+	for i := 0; i < 3; i++ {
+		if board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
+			if board[i][0] == 'X' {
 				return 10 - depth
 			} else {
 				return depth - 10
@@ -240,8 +257,8 @@ func score(board *[9]rune, depth int) int {
 
 	// Vertical
 	for i := 0; i < 3; i++ {
-		if board[i] != EMPTY && board[i] == board[i+3] && board[i] == board[i+6] {
-			if board[i] == 'X' {
+		if board[0][i] != EMPTY && board[0][i] == board[1][i] && board[0][i] == board[2][i] {
+			if board[0][i] == 'X' {
 				return 10 - depth
 			} else {
 				return depth - 10
@@ -250,15 +267,15 @@ func score(board *[9]rune, depth int) int {
 	}
 
 	// Diagonal
-	if board[4] != EMPTY && board[0] == board[4] && board[4] == board[8] {
-		if board[4] == 'X' {
+	if board[1][1] != EMPTY && board[1][1] == board[0][0] && board[1][1] == board[2][2] {
+		if board[1][1] == 'X' {
 			return 10 - depth
 		} else {
 			return depth - 10
 		}
 	}
-	if board[4] != EMPTY && board[2] == board[4] && board[4] == board[6] {
-		if board[4] == 'X' {
+	if board[1][1] != EMPTY && board[1][1] == board[0][2] && board[1][1] == board[2][0] {
+		if board[1][1] == 'X' {
 			return 10 - depth
 		} else {
 			return depth - 10
@@ -269,26 +286,26 @@ func score(board *[9]rune, depth int) int {
 	return 0
 }
 
-func check_winner(board *[9]rune) bool {
+func check_winner(board *[3][3]rune) bool {
 	// Horizontal
-	for i := 0; i+2 < 9; i += 3 {
-		if board[i] != EMPTY && board[i] == board[i+1] && board[i] == board[i+2] {
+	for i := 0; i < 3; i++ {
+		if board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
 			return true
 		}
 	}
 
 	// Vertical
 	for i := 0; i < 3; i++ {
-		if board[i] != EMPTY && board[i] == board[i+3] && board[i] == board[i+6] {
+		if board[0][i] != EMPTY && board[0][i] == board[1][i] && board[0][i] == board[2][i] {
 			return true
 		}
 	}
 
 	// Diagonal
-	if board[4] != EMPTY && board[0] == board[4] && board[4] == board[8] {
+	if board[1][1] != EMPTY && board[1][1] == board[0][0] && board[1][1] == board[2][2] {
 		return true
 	}
-	if board[4] != EMPTY && board[2] == board[4] && board[4] == board[6] {
+	if board[1][1] != EMPTY && board[1][1] == board[0][2] && board[1][1] == board[2][0] {
 		return true
 	}
 
@@ -303,31 +320,32 @@ func check_valid(row int, col int) bool {
 	if col < 1 || col > 3 {
 		return false
 	}
-	location := (row-1)*3 - 1 + col
-
-	if board[location] != EMPTY {
+	if board[row-1][col-1] != EMPTY {
 		return false
 	}
 
 	return true
 }
 
-func print_board(board *[9]rune) {
-	for i := 0; i+2 < 9; i += 3 {
-		fmt.Printf("%c %c %c\n", board[i], board[i+1], board[i+2])
-	}
-}
+// func print_board(board *[3][3]rune) {
+// 	for i := 0; i < 3; i++ {
+// 		fmt.Printf("%c %c %c\n", board[i], board[i+1], board[i+2])
+// 	}
+// }
 
-func is_game_over(board *[9]rune) bool {
+func is_game_over(board *[3][3]rune) bool {
 	if check_winner(board) {
 		return true
 	}
 
-	for _, val := range board {
-		if val == EMPTY {
-			return false
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			if board[i][j] == EMPTY {
+				return false
+			}
 		}
 	}
+
 	return true
 }
 
@@ -401,7 +419,7 @@ func is_game_over(board *[9]rune) bool {
 // }
 
 func main() {
-	// var board [9]rune = [9]rune{
+	// var board [3][3]rune = [3][3]rune{
 	// 	// 'O', 'O', '$',
 	// 	// 'X', 'X', '$',
 	// 	// 'O', 'X', '$',
