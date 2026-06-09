@@ -1,4 +1,6 @@
-# CPU TicTacToe
+# AI TicTacToe (TUI)
+> This is the TUI Version.
+
 Well well well, I have made the two player TicTacToe game many times. It is very easy, you only need a little bit of logic to create TWO player TicTacToe game.
 
 But when it comes to creating TicTacToe game when the computer will be making the moves, it becomes exponentially difficult.
