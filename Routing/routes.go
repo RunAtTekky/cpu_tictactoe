@@ -16,17 +16,21 @@ func Hello_handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func Place_handler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
 	var req models.Request
 	json.NewDecoder(r.Body).Decode(&req)
 	print_request(req)
 
 	inserted := models.Board_IN_use.Insert(req.Row, req.Col, req.X_turn)
 	if !inserted {
-		fmt.Fprintf(w, "FAILED! Already present!\n")
+		res := &models.MoveResponse{
+			Success:  false,
+			ErrorMsg: "FAILED! Already present!",
+		}
+
+		json.NewEncoder(w).Encode(res)
 		return
 	}
-
-	fmt.Fprintf(w, "Success!\n")
 
 	// Print board after insertion
 	models.Board_IN_use.Print_Board()
@@ -38,6 +42,15 @@ func Place_handler(w http.ResponseWriter, r *http.Request) {
 	// Make the move from AI side
 	models.Board_IN_use.Insert(best_move.Move.Row, best_move.Move.Col, board.X_turn)
 	models.Board_IN_use.Print_Board()
+
+	res := &models.MoveResponse{
+		Row:      best_move.Move.Row,
+		Col:      best_move.Move.Col,
+		Success:  true,
+		ErrorMsg: "",
+	}
+
+	json.NewEncoder(w).Encode(res)
 }
 
 func print_request(req models.Request) {
@@ -58,9 +71,19 @@ func Has_won_handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func Game_over_handler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
 	if game.Is_game_over(&models.Board_IN_use.Board) {
 		fmt.Fprint(w, true)
+		res := &models.GameStateResponse{
+			Success:  true,
+			GameOver: true,
+		}
+		json.NewEncoder(w).Encode(res)
 	} else {
-		fmt.Fprint(w, false)
+		res := &models.GameStateResponse{
+			Success:  true,
+			GameOver: false,
+		}
+		json.NewEncoder(w).Encode(res)
 	}
 }
