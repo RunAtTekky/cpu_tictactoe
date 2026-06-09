@@ -43,9 +43,9 @@ func (board *Board) Insert(row, col int, x_turn bool) bool {
 }
 
 func (board *Board) Print_Board() {
-	for row := range 3 {
-		log.Println(string(board.Board[row][0]), string(board.Board[row][1]), string(board.Board[row][2]))
-	}
-
-	log.Println()
+	log.Printf("Board:\n%s\n%s\n%s\n",
+		string(board.Board[0][:]),
+		string(board.Board[1][:]),
+		string(board.Board[2][:]),
+	)
 }
