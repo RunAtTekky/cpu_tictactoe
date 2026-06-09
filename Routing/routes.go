@@ -48,3 +48,19 @@ You passed this data:
 	TURN: %t
 `, req.Row, req.Col, req.X_turn)
 }
+
+func Has_won_handler(w http.ResponseWriter, r *http.Request) {
+	if game.Check_winner(&models.Board_IN_use.Board) {
+		fmt.Fprint(w, true)
+	} else {
+		fmt.Fprint(w, false)
+	}
+}
+
+func Game_over_handler(w http.ResponseWriter, r *http.Request) {
+	if game.Is_game_over(&models.Board_IN_use.Board) {
+		fmt.Fprint(w, true)
+	} else {
+		fmt.Fprint(w, false)
+	}
+}
