@@ -1,0 +1,146 @@
+package game
+
+var board [3][3]rune
+var EMPTY rune = '$'
+
+type Move struct {
+	Row int
+	Col int
+}
+
+type BestMove struct {
+	Move  Move
+	Score int
+}
+
+func Get_available_moves(board *[3][3]rune) []Move {
+	var moves []Move
+
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			if board[i][j] == EMPTY {
+				var new_move Move = Move{
+					Row: i,
+					Col: j,
+				}
+				moves = append(moves, new_move)
+			}
+		}
+	}
+
+	return moves
+}
+
+func Score(board *[3][3]rune, depth int) int {
+	// Horizontal
+	for i := 0; i < 3; i++ {
+		if board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
+			if board[i][0] == 'X' {
+				return 10 - depth
+			} else {
+				return depth - 10
+			}
+		}
+	}
+
+	// Vertical
+	for i := 0; i < 3; i++ {
+		if board[0][i] != EMPTY && board[0][i] == board[1][i] && board[0][i] == board[2][i] {
+			if board[0][i] == 'X' {
+				return 10 - depth
+			} else {
+				return depth - 10
+			}
+		}
+	}
+
+	// Diagonal
+	if board[1][1] != EMPTY && board[1][1] == board[0][0] && board[1][1] == board[2][2] {
+		if board[1][1] == 'X' {
+			return 10 - depth
+		} else {
+			return depth - 10
+		}
+	}
+	if board[1][1] != EMPTY && board[1][1] == board[0][2] && board[1][1] == board[2][0] {
+		if board[1][1] == 'X' {
+			return 10 - depth
+		} else {
+			return depth - 10
+		}
+	}
+
+	// It must be draw
+	return 0
+}
+
+func Check_winner(board *[3][3]rune) bool {
+	// Horizontal
+	for i := 0; i < 3; i++ {
+		if board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
+			return true
+		}
+	}
+
+	// Vertical
+	for i := 0; i < 3; i++ {
+		if board[0][i] != EMPTY && board[0][i] == board[1][i] && board[0][i] == board[2][i] {
+			return true
+		}
+	}
+
+	// Diagonal
+	if board[1][1] != EMPTY && board[1][1] == board[0][0] && board[1][1] == board[2][2] {
+		return true
+	}
+	if board[1][1] != EMPTY && board[1][1] == board[0][2] && board[1][1] == board[2][0] {
+		return true
+	}
+
+	return false
+
+}
+
+func Check_valid(row int, col int) bool {
+	if row < 1 || row > 3 {
+		return false
+	}
+	if col < 1 || col > 3 {
+		return false
+	}
+	if board[row-1][col-1] != EMPTY {
+		return false
+	}
+
+	return true
+}
+
+func Is_game_over(board *[3][3]rune) bool {
+	if Check_winner(board) {
+		return true
+	}
+
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			if board[i][j] == EMPTY {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func Get_new_state(board *[3][3]rune, move Move, is_x_turn bool) [3][3]rune {
+	var new_state [3][3]rune
+
+	new_state = *board
+
+	if is_x_turn {
+		new_state[move.Row][move.Col] = 'X'
+	} else {
+		new_state[move.Row][move.Col] = 'O'
+	}
+
+	return new_state
+}

@@ -7,9 +7,10 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+
+	"tictactoe/game"
 )
 
-var EMPTY rune = '$'
 var game_over bool = false
 var board [3][3]rune
 var x_turn bool = true
@@ -85,7 +86,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	if m.game_over_m {
-		if !check_winner(&m.board) {
+		if !game.Check_winner(&m.board) {
 			return "DRAW"
 		}
 
@@ -126,16 +127,6 @@ func (m model) View() string {
 	return grid + "\n\nUse VIM Bindings to move. Press q to quit. Press r to restart"
 }
 
-type Move struct {
-	row int
-	col int
-}
-
-type BestMove struct {
-	move  Move
-	score int
-}
-
 func restart_game(m *model) {
 	m.board = [3][3]rune{
 		{'$', '$', '$'},
@@ -146,9 +137,9 @@ func restart_game(m *model) {
 	if !m.x_turn_m {
 		best_move := minimax(m.board, m.x_turn_m, m.depth)
 		if m.x_turn_m {
-			m.board[best_move.move.row][best_move.move.col] = 'X'
+			m.board[best_move.Move.Row][best_move.Move.Col] = 'X'
 		} else {
-			m.board[best_move.move.row][best_move.move.col] = 'O'
+			m.board[best_move.Move.Row][best_move.Move.Col] = 'O'
 		}
 		m.x_turn_m = !m.x_turn_m
 	}
@@ -158,7 +149,7 @@ func restart_game(m *model) {
 }
 
 func make_move(m *model) {
-	if m.board[m.cursorY][m.cursorX] != EMPTY {
+	if m.board[m.cursorY][m.cursorX] != game.EMPTY {
 		return
 	}
 	if m.x_turn_m {
@@ -167,7 +158,7 @@ func make_move(m *model) {
 		m.board[m.cursorY][m.cursorX] = 'O'
 	}
 
-	if is_game_over(&m.board) {
+	if game.Is_game_over(&m.board) {
 		m.game_over_m = true
 		return
 	}
@@ -176,219 +167,85 @@ func make_move(m *model) {
 
 	best_move := minimax(m.board, m.x_turn_m, m.depth)
 	if m.x_turn_m {
-		m.board[best_move.move.row][best_move.move.col] = 'X'
+		m.board[best_move.Move.Row][best_move.Move.Col] = 'X'
 	} else {
-		m.board[best_move.move.row][best_move.move.col] = 'O'
+		m.board[best_move.Move.Row][best_move.Move.Col] = 'O'
 	}
-	if is_game_over(&m.board) {
+	if game.Is_game_over(&m.board) {
 		m.game_over_m = true
 		return
 	}
 	m.x_turn_m = !m.x_turn_m
 }
 
-func minimax(board [3][3]rune, is_x_turn bool, depth int) BestMove {
+func minimax(board [3][3]rune, is_x_turn bool, depth int) game.BestMove {
 	if depth == 8 {
-		return BestMove{
-			score: 0,
-			move:  Move{},
+		return game.BestMove{
+			Score: 0,
+			Move:  game.Move{},
 		}
 	}
-	if check_winner(&board) {
-		return BestMove{
-			score: score(&board, depth),
-			move:  Move{},
+	if game.Check_winner(&board) {
+		return game.BestMove{
+			Score: game.Score(&board, depth),
+			Move:  game.Move{},
 		}
 	}
 	depth++
-	var moves []Move
+	var moves []game.Move
 	var scores []int
 
 	// Go through all the possible moves
-	available_moves := get_available_moves(&board)
+	available_moves := game.Get_available_moves(&board)
 
 	// fmt.Println(available_moves)
 
 	for _, move := range available_moves {
-		possible_game := get_new_state(&board, move, is_x_turn)
-		scores = append(scores, minimax(possible_game, !is_x_turn, depth).score)
+		possible_game := game.Get_new_state(&board, move, is_x_turn)
+		scores = append(scores, minimax(possible_game, !is_x_turn, depth).Score)
 		moves = append(moves, move)
 	}
 
 	if is_x_turn {
-		best_move := BestMove{
-			score: math.MinInt,
-			move:  Move{},
+		best_move := game.BestMove{
+			Score: math.MinInt,
+			Move:  game.Move{},
 		}
 		for i, val := range scores {
-			if val > best_move.score {
-				best_move.score = val
-				best_move.move.row = moves[i].row
-				best_move.move.col = moves[i].col
+			if val > best_move.Score {
+				best_move.Score = val
+				best_move.Move.Row = moves[i].Row
+				best_move.Move.Col = moves[i].Col
 			}
 		}
-		if best_move.score == math.MinInt {
-			return BestMove{
-				score: 0,
-				move:  Move{},
+		if best_move.Score == math.MinInt {
+			return game.BestMove{
+				Score: 0,
+				Move:  game.Move{},
 			}
 		}
 
 		return best_move
 	} else {
-		best_move := BestMove{
-			score: math.MaxInt,
-			move:  Move{},
+		best_move := game.BestMove{
+			Score: math.MaxInt,
+			Move:  game.Move{},
 		}
 		for i, val := range scores {
-			if val < best_move.score {
-				best_move.score = val
-				best_move.move.row = moves[i].row
-				best_move.move.col = moves[i].col
+			if val < best_move.Score {
+				best_move.Score = val
+				best_move.Move.Row = moves[i].Row
+				best_move.Move.Col = moves[i].Col
 			}
 		}
-		if best_move.score == math.MaxInt {
-			return BestMove{
-				score: 0,
-				move:  Move{},
+		if best_move.Score == math.MaxInt {
+			return game.BestMove{
+				Score: 0,
+				Move:  game.Move{},
 			}
 		}
 		return best_move
 	}
-}
-
-func get_new_state(board *[3][3]rune, move Move, is_x_turn bool) [3][3]rune {
-	var new_state [3][3]rune
-
-	for i, val := range board {
-		new_state[i] = val
-	}
-
-	if is_x_turn {
-		new_state[move.row][move.col] = 'X'
-	} else {
-		new_state[move.row][move.col] = 'O'
-	}
-
-	return new_state
-}
-
-func get_available_moves(board *[3][3]rune) []Move {
-	var moves []Move
-
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			if board[i][j] == EMPTY {
-				var new_move Move = Move{
-					row: i,
-					col: j,
-				}
-				moves = append(moves, new_move)
-			}
-		}
-	}
-
-	return moves
-}
-
-func score(board *[3][3]rune, depth int) int {
-	// Horizontal
-	for i := 0; i < 3; i++ {
-		if board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
-			if board[i][0] == 'X' {
-				return 10 - depth
-			} else {
-				return depth - 10
-			}
-		}
-	}
-
-	// Vertical
-	for i := 0; i < 3; i++ {
-		if board[0][i] != EMPTY && board[0][i] == board[1][i] && board[0][i] == board[2][i] {
-			if board[0][i] == 'X' {
-				return 10 - depth
-			} else {
-				return depth - 10
-			}
-		}
-	}
-
-	// Diagonal
-	if board[1][1] != EMPTY && board[1][1] == board[0][0] && board[1][1] == board[2][2] {
-		if board[1][1] == 'X' {
-			return 10 - depth
-		} else {
-			return depth - 10
-		}
-	}
-	if board[1][1] != EMPTY && board[1][1] == board[0][2] && board[1][1] == board[2][0] {
-		if board[1][1] == 'X' {
-			return 10 - depth
-		} else {
-			return depth - 10
-		}
-	}
-
-	// It must be draw
-	return 0
-}
-
-func check_winner(board *[3][3]rune) bool {
-	// Horizontal
-	for i := 0; i < 3; i++ {
-		if board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
-			return true
-		}
-	}
-
-	// Vertical
-	for i := 0; i < 3; i++ {
-		if board[0][i] != EMPTY && board[0][i] == board[1][i] && board[0][i] == board[2][i] {
-			return true
-		}
-	}
-
-	// Diagonal
-	if board[1][1] != EMPTY && board[1][1] == board[0][0] && board[1][1] == board[2][2] {
-		return true
-	}
-	if board[1][1] != EMPTY && board[1][1] == board[0][2] && board[1][1] == board[2][0] {
-		return true
-	}
-
-	return false
-
-}
-
-func check_valid(row int, col int) bool {
-	if row < 1 || row > 3 {
-		return false
-	}
-	if col < 1 || col > 3 {
-		return false
-	}
-	if board[row-1][col-1] != EMPTY {
-		return false
-	}
-
-	return true
-}
-
-func is_game_over(board *[3][3]rune) bool {
-	if check_winner(board) {
-		return true
-	}
-
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			if board[i][j] == EMPTY {
-				return false
-			}
-		}
-	}
-
-	return true
 }
 
 func main() {
