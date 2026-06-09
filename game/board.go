@@ -2,7 +2,6 @@ package game
 
 type Board [3][3]rune
 
-var current_board [3][3]rune
 var EMPTY rune = '$'
 var MINIMAX_CONSTANT int = 10
 
@@ -104,14 +103,14 @@ func Check_winner(board *Board) bool {
 
 }
 
-func Check_valid(row int, col int) bool {
+func Check_valid(row int, col int, board Board) bool {
 	if row < 1 || row > 3 {
 		return false
 	}
 	if col < 1 || col > 3 {
 		return false
 	}
-	if current_board[row-1][col-1] != EMPTY {
+	if board[row-1][col-1] != EMPTY {
 		return false
 	}
 

@@ -63,3 +63,28 @@ func TestGameOver(t *testing.T) {
 		}
 	})
 }
+
+func TestValid(t *testing.T) {
+	board := Board{
+		{'$', '$', 'O'},
+		{'$', 'O', '$'},
+		{'O', '$', '$'},
+	}
+	t.Run("Row 1 Col 1 is valid", func(t *testing.T) {
+		got := Check_valid(1, 1, board)
+		want := true
+
+		if got != want {
+			t.Errorf("Wanted %t but got %t", want, got)
+		}
+	})
+
+	t.Run("Row is negative", func(t *testing.T) {
+		got := Check_valid(-2, 1, board)
+		want := false
+
+		if got != want {
+			t.Errorf("Wanted %t but got %t", want, got)
+		}
+	})
+}
