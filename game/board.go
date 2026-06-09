@@ -2,6 +2,7 @@ package game
 
 var board [3][3]rune
 var EMPTY rune = '$'
+var MINIMAX_CONSTANT int = 10
 
 type Move struct {
 	Row int
@@ -16,8 +17,8 @@ type BestMove struct {
 func Get_available_moves(board *[3][3]rune) []Move {
 	var moves []Move
 
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
+	for i := range 3 {
+		for j := range 3 {
 			if board[i][j] == EMPTY {
 				var new_move Move = Move{
 					Row: i,
@@ -33,23 +34,23 @@ func Get_available_moves(board *[3][3]rune) []Move {
 
 func Score(board *[3][3]rune, depth int) int {
 	// Horizontal
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		if board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
 			if board[i][0] == 'X' {
-				return 10 - depth
+				return MINIMAX_CONSTANT - depth
 			} else {
-				return depth - 10
+				return depth - MINIMAX_CONSTANT
 			}
 		}
 	}
 
 	// Vertical
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		if board[0][i] != EMPTY && board[0][i] == board[1][i] && board[0][i] == board[2][i] {
 			if board[0][i] == 'X' {
-				return 10 - depth
+				return MINIMAX_CONSTANT - depth
 			} else {
-				return depth - 10
+				return depth - MINIMAX_CONSTANT
 			}
 		}
 	}
@@ -57,16 +58,16 @@ func Score(board *[3][3]rune, depth int) int {
 	// Diagonal
 	if board[1][1] != EMPTY && board[1][1] == board[0][0] && board[1][1] == board[2][2] {
 		if board[1][1] == 'X' {
-			return 10 - depth
+			return MINIMAX_CONSTANT - depth
 		} else {
-			return depth - 10
+			return depth - MINIMAX_CONSTANT
 		}
 	}
 	if board[1][1] != EMPTY && board[1][1] == board[0][2] && board[1][1] == board[2][0] {
 		if board[1][1] == 'X' {
-			return 10 - depth
+			return MINIMAX_CONSTANT - depth
 		} else {
-			return depth - 10
+			return depth - MINIMAX_CONSTANT
 		}
 	}
 
@@ -76,14 +77,14 @@ func Score(board *[3][3]rune, depth int) int {
 
 func Check_winner(board *[3][3]rune) bool {
 	// Horizontal
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		if board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
 			return true
 		}
 	}
 
 	// Vertical
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		if board[0][i] != EMPTY && board[0][i] == board[1][i] && board[0][i] == board[2][i] {
 			return true
 		}
@@ -120,8 +121,8 @@ func Is_game_over(board *[3][3]rune) bool {
 		return true
 	}
 
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
+	for i := range 3 {
+		for j := range 3 {
 			if board[i][j] == EMPTY {
 				return false
 			}
