@@ -26,7 +26,9 @@ TURN: %t
 `, req.Row, req.Col, req.X_turn)
 
 	models.Board_IN_use.Print_Board()
-	if !models.Board_IN_use.Insert(req.Row, req.Col, req.X_turn) {
+
+	inserted := models.Board_IN_use.Insert(req.Row, req.Col, req.X_turn)
+	if !inserted {
 		fmt.Fprintf(w, "FAILED! Already present!\n")
 		return
 	}
@@ -37,7 +39,7 @@ TURN: %t
 	board := models.Board_IN_use
 
 	best_move := game.Minimax(board.Board, board.X_turn, board.Depth)
-	log.Println(best_move)
+	log.Printf("Best move %v\n", best_move)
 
 	models.Board_IN_use.Insert(best_move.Move.Row, best_move.Move.Col, board.X_turn)
 	models.Board_IN_use.Print_Board()

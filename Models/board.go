@@ -2,17 +2,19 @@ package models
 
 import (
 	"log"
+
+	"github.com/RunAtTekky/backend/game"
 )
 
 type Board struct {
-	Board     [3][3]rune `json:"board"`
+	Board     game.Board `json:"board"`
 	X_turn    bool       `json:"x_turn"`
 	Game_over bool       `json:"game_over"`
 	Depth     int        `json:"depth"`
 }
 
 var Board_IN_use Board = Board{
-	Board: [3][3]rune{
+	Board: game.Board{
 		{'$', '$', '$'},
 		{'$', '$', '$'},
 		{'$', '$', '$'},
@@ -41,7 +43,7 @@ func (board *Board) Insert(row, col int, x_turn bool) bool {
 }
 
 func (board *Board) Print_Board() {
-	for row := 0; row < 3; row++ {
+	for row := range 3 {
 		log.Println(string(board.Board[row][0]), string(board.Board[row][1]), string(board.Board[row][2]))
 	}
 
