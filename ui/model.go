@@ -72,25 +72,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	if m.game_over_m {
-		if !game.Check_winner(&m.board) {
-			return "DRAW"
-		}
-
-		s := "GAME OVER\n"
-		if m.x_turn_m {
-			s += "X WON!"
-		} else {
-			s += "O WON!"
-		}
-		return s
-	}
-
 	rows := make([]string, 3)
 
-	for y := 0; y < 3; y++ {
+	for y := range 3 {
 		cells := make([]string, 3)
-		for x := 0; x < 3; x++ {
+		for x := range 3 {
 			cell := ' '
 			if m.board[y][x] != 0 {
 				cell = m.board[y][x]
@@ -110,6 +96,18 @@ func (m Model) View() string {
 
 	// Join all rows vertically
 	grid := lipgloss.JoinVertical(lipgloss.Left, rows...)
+
+	if m.game_over_m {
+		s := "GAME OVER\n"
+		if !game.Check_winner(&m.board) {
+			s += "DRAW"
+		} else if m.x_turn_m {
+			s += "X WON!"
+		} else {
+			s += "O WON!"
+		}
+		return grid + "\n\n" + s
+	}
 
 	return grid + "\n\nUse VIM Bindings to move. Press q to quit. Press r to restart"
 }
