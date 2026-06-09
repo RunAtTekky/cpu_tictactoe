@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	internal "github.com/RunAtTekky/backend/Internal"
 	models "github.com/RunAtTekky/backend/Models"
+	"github.com/RunAtTekky/backend/game"
 )
 
 func Hello_handler(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +35,7 @@ TURN: %t
 
 	board := models.Board_IN_use
 
-	best_move := internal.Minimax(board.Board, board.X_turn, board.Depth)
+	best_move := game.Minimax(board.Board, board.X_turn, board.Depth)
 	fmt.Println(best_move)
 
 	models.Board_IN_use.Insert(best_move.Move.Row, best_move.Move.Col, board.X_turn)
