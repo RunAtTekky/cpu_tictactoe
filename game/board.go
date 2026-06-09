@@ -1,5 +1,7 @@
 package game
 
+type Board [3][3]rune
+
 var board [3][3]rune
 var EMPTY rune = '$'
 var MINIMAX_CONSTANT int = 10
@@ -14,7 +16,7 @@ type BestMove struct {
 	Score int
 }
 
-func Get_available_moves(board *[3][3]rune) []Move {
+func Get_available_moves(board *Board) []Move {
 	var moves []Move
 
 	for i := range 3 {
@@ -32,7 +34,7 @@ func Get_available_moves(board *[3][3]rune) []Move {
 	return moves
 }
 
-func Score(board *[3][3]rune, depth int) int {
+func Score(board *Board, depth int) int {
 	// Horizontal
 	for i := range 3 {
 		if board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
@@ -75,7 +77,7 @@ func Score(board *[3][3]rune, depth int) int {
 	return 0
 }
 
-func Check_winner(board *[3][3]rune) bool {
+func Check_winner(board *Board) bool {
 	// Horizontal
 	for i := range 3 {
 		if board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][0] == board[i][2] {
@@ -116,7 +118,7 @@ func Check_valid(row int, col int) bool {
 	return true
 }
 
-func Is_game_over(board *[3][3]rune) bool {
+func Is_game_over(board *Board) bool {
 	if Check_winner(board) {
 		return true
 	}
@@ -132,7 +134,7 @@ func Is_game_over(board *[3][3]rune) bool {
 	return true
 }
 
-func Get_new_state(board *[3][3]rune, move Move, is_x_turn bool) [3][3]rune {
+func Get_new_state(board *Board, move Move, is_x_turn bool) Board {
 	var new_state [3][3]rune
 
 	new_state = *board

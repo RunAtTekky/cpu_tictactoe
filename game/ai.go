@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-func Minimax(board [3][3]rune, is_x_turn bool, depth int) BestMove {
+func Minimax(board Board, is_x_turn bool, depth int) BestMove {
 	if depth == 8 {
 		return BestMove{
 			Score: 0,

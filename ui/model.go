@@ -8,7 +8,7 @@ import (
 )
 
 type Model struct {
-	board       [3][3]rune
+	board       game.Board
 	x_turn_m    bool
 	game_over_m bool
 	cursorX     int
