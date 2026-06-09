@@ -24,8 +24,6 @@ func Minimax(board Board, is_x_turn bool, depth int) BestMove {
 	// Go through all the possible moves
 	available_moves := Get_available_moves(&board)
 
-	// fmt.Println(available_moves)
-
 	for _, move := range available_moves {
 		possible_game := Get_new_state(&board, move, is_x_turn)
 		scores = append(scores, Minimax(possible_game, !is_x_turn, depth).Score)

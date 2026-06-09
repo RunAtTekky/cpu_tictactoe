@@ -2,16 +2,20 @@ package routing
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 )
 
 func Serve() {
 	http.HandleFunc("/hello", Hello_handler)
 	http.HandleFunc("/place", Place_handler)
+	http.HandleFunc("/has_won", Has_won_handler)
+	http.HandleFunc("/game_over", Game_over_handler)
 
-	fmt.Println("Server listening on port 8090")
+	PORT := 8090
+	log.Printf("Server listening on port %d\n", PORT)
 
-	if err := http.ListenAndServe(":8090", nil); err != nil {
-		fmt.Printf("Server error %v", err)
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil); err != nil {
+		log.Fatalf("Server error %v", err)
 	}
 }
