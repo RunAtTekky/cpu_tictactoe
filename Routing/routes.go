@@ -3,6 +3,7 @@ package routing
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	models "github.com/RunAtTekky/backend/Models"
@@ -18,7 +19,7 @@ func Place_handler(w http.ResponseWriter, r *http.Request) {
 	var req models.Request
 	json.NewDecoder(r.Body).Decode(&req)
 
-	fmt.Printf(`You passed this data:
+	log.Printf(`You passed this data:
 ROW: %d
 COL: %d
 TURN: %t
@@ -36,7 +37,7 @@ TURN: %t
 	board := models.Board_IN_use
 
 	best_move := game.Minimax(board.Board, board.X_turn, board.Depth)
-	fmt.Println(best_move)
+	log.Println(best_move)
 
 	models.Board_IN_use.Insert(best_move.Move.Row, best_move.Move.Col, board.X_turn)
 	models.Board_IN_use.Print_Board()

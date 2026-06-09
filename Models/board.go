@@ -1,6 +1,8 @@
 package models
 
-import "fmt"
+import (
+	"log"
+)
 
 type Board struct {
 	Board     [3][3]rune `json:"board"`
@@ -40,8 +42,8 @@ func (board *Board) Insert(row, col int, x_turn bool) bool {
 
 func (board *Board) Print_Board() {
 	for row := 0; row < 3; row++ {
-		fmt.Println(string(board.Board[row][0]), string(board.Board[row][1]), string(board.Board[row][2]))
+		log.Println(string(board.Board[row][0]), string(board.Board[row][1]), string(board.Board[row][2]))
 	}
 
-	fmt.Println()
+	log.Println()
 }
