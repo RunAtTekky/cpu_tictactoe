@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	internal "github.com/RunAtTekky/backend/Internal"
 	models "github.com/RunAtTekky/backend/Models"
 	"github.com/RunAtTekky/backend/game"
 )
@@ -19,7 +20,7 @@ func Place_handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	var req models.Request
 	json.NewDecoder(r.Body).Decode(&req)
-	print_request(req)
+	internal.Print_request(req)
 
 	inserted := models.Board_IN_use.Insert(req.Row, req.Col, req.X_turn)
 	if !inserted {
@@ -51,15 +52,6 @@ func Place_handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(res)
-}
-
-func print_request(req models.Request) {
-	log.Printf(`
-You passed this data:
-	ROW: %d
-	COL: %d
-	TURN: %t
-`, req.Row, req.Col, req.X_turn)
 }
 
 func Has_won_handler(w http.ResponseWriter, r *http.Request) {
