@@ -9,6 +9,6 @@ type MoveResponse struct {
 
 type GameStateResponse struct {
 	GameOver bool `json:"game_over"`
-	X_won    bool `json:"x_won"`
+	HasWon   bool `json:"has_won"`
 	Success  bool `json:"success"`
 }

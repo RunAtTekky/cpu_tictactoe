@@ -63,17 +63,27 @@ You passed this data:
 }
 
 func Has_won_handler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
 	if game.Check_winner(&models.Board_IN_use.Board) {
-		fmt.Fprint(w, true)
+		res := &models.GameStateResponse{
+			Success: true,
+			HasWon:  true,
+		}
+
+		json.NewEncoder(w).Encode(res)
 	} else {
-		fmt.Fprint(w, false)
+		res := &models.GameStateResponse{
+			Success: true,
+			HasWon:  false,
+		}
+
+		json.NewEncoder(w).Encode(res)
 	}
 }
 
 func Game_over_handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	if game.Is_game_over(&models.Board_IN_use.Board) {
-		fmt.Fprint(w, true)
 		res := &models.GameStateResponse{
 			Success:  true,
 			GameOver: true,
