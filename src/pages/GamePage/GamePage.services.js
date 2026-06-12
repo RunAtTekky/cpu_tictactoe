@@ -11,12 +11,10 @@ export const mark_spot = async (row, col, isXTurn) => {
     });
     if (!response.ok) return;
 
-    const body = response.json();
+    const body = await response.json();
 
-    console.log(body);
-    // const { row, col, success, errMsg } = body;
-    // console.log(row);
-    // console.log(col);
-    // console.log(success);
-    // console.log(errMsg);
+    return {
+        row: body.row,
+        col: body.col,
+    }
 }
