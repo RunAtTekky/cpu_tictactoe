@@ -18,8 +18,10 @@ export const Board = () => {
 
   return (
     <>
-      <h1>AI TicTacToe</h1>
-      {cellsBtn}
+      <h1 className="heading">AI TicTacToe</h1>
+      <div className="board">
+        {cellsBtn}
+      </div>
     </>
   );
 }

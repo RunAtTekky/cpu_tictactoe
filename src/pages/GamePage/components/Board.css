@@ -1,0 +1,10 @@
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 8rem);
+    background-color: brown;
+}
+
+.heading {
+    color: brown;
+    font-size: 4rem;
+}
