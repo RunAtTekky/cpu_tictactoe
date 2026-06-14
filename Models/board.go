@@ -1,6 +1,5 @@
 package models
 
-
 import (
 	"log"
 
@@ -28,6 +27,10 @@ var Board_IN_use Board = Board{
 var EMPTY = '$'
 
 func (board *Board) Insert(row, col int, x_turn bool) bool {
+	if game.Is_game_over(&board.Board) {
+		return false
+	}
+
 	if board.Board[row][col] != EMPTY {
 		return false
 	}

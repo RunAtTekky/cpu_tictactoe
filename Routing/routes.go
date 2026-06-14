@@ -24,7 +24,7 @@ func Place_handler(w http.ResponseWriter, r *http.Request) {
 
 	inserted := models.Board_IN_use.Insert(req.Row, req.Col, req.X_turn)
 	if !inserted {
-		res := &models.MoveResponse{
+		res := &models.GameResponse{
 			Success:  false,
 			ErrorMsg: "FAILED! Already present!",
 		}
@@ -44,9 +44,10 @@ func Place_handler(w http.ResponseWriter, r *http.Request) {
 	models.Board_IN_use.Insert(best_move.Move.Row, best_move.Move.Col, board.X_turn)
 	models.Board_IN_use.Print_Board()
 
-	res := &models.MoveResponse{
+	res := &models.GameResponse{
 		Row:      best_move.Move.Row,
 		Col:      best_move.Move.Col,
+		GameOver: game.Is_game_over(&models.Board_IN_use.Board),
 		Success:  true,
 		ErrorMsg: "",
 	}
@@ -57,14 +58,14 @@ func Place_handler(w http.ResponseWriter, r *http.Request) {
 func Has_won_handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	if game.Check_winner(&models.Board_IN_use.Board) {
-		res := &models.GameStateResponse{
+		res := &models.GameResponse{
 			Success: true,
 			HasWon:  true,
 		}
 
 		json.NewEncoder(w).Encode(res)
 	} else {
-		res := &models.GameStateResponse{
+		res := &models.GameResponse{
 			Success: true,
 			HasWon:  false,
 		}
@@ -76,13 +77,13 @@ func Has_won_handler(w http.ResponseWriter, r *http.Request) {
 func Game_over_handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	if game.Is_game_over(&models.Board_IN_use.Board) {
-		res := &models.GameStateResponse{
+		res := &models.GameResponse{
 			Success:  true,
 			GameOver: true,
 		}
 		json.NewEncoder(w).Encode(res)
 	} else {
-		res := &models.GameStateResponse{
+		res := &models.GameResponse{
 			Success:  true,
 			GameOver: false,
 		}
