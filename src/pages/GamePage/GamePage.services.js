@@ -22,3 +22,21 @@ export const mark_spot = async (row, col, isXTurn) => {
         errMsg: body.errMsg
     }
 }
+
+export const validate_placement = async (row, col, isXTurn) => {
+    const response = await fetch(API.BASE_URL + API.VALIDATE, {
+        method: "POST",
+        body: JSON.stringify({
+            row: row,
+            col: col,
+            x_turn: isXTurn
+        })
+    });
+    if (!response.ok) return;
+
+    const body = await response.json();
+
+    return {
+        canPlace: body.can_place,
+    }
+}

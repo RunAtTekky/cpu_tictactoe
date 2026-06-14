@@ -8,5 +8,6 @@ export const API = {
     BASE_URL: "http://localhost:8090",
     PLACE: "/place",
     HAS_WON: "/has_won",
-    GAME_OVER: "/game_over"
+    GAME_OVER: "/game_over",
+    VALIDATE: "/validate"
 }
