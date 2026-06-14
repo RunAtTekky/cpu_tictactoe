@@ -15,6 +15,10 @@ type BestMove struct {
 	Score int
 }
 
+func CanPlace(board *Board, row, col int) bool {
+	return board[row][col] == EMPTY
+}
+
 func Get_available_moves(board *Board) []Move {
 	var moves []Move
 

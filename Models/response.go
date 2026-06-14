@@ -8,3 +8,7 @@ type GameResponse struct {
 	Success  bool   `json:"success"`
 	ErrorMsg string `json:"errMsg"`
 }
+
+type ValidateResponse struct {
+	CanPlace bool `json:"can_place"`
+}

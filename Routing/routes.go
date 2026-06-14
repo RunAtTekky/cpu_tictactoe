@@ -13,7 +13,20 @@ import (
 
 func Hello_handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello World\n")
+}
 
+func Validate_handler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	var req models.Request
+	json.NewDecoder(r.Body).Decode(&req)
+	internal.Print_request(req)
+
+	res := &models.ValidateResponse{
+		CanPlace: game.CanPlace(&models.Board_IN_use.Board, req.Row, req.Col),
+	}
+
+	json.NewEncoder(w).Encode(res)
 }
 
 func Place_handler(w http.ResponseWriter, r *http.Request) {
@@ -48,6 +61,7 @@ func Place_handler(w http.ResponseWriter, r *http.Request) {
 		Row:      best_move.Move.Row,
 		Col:      best_move.Move.Col,
 		GameOver: game.Is_game_over(&models.Board_IN_use.Board),
+		HasWon:   game.Check_winner(&models.Board_IN_use.Board),
 		Success:  true,
 		ErrorMsg: "",
 	}

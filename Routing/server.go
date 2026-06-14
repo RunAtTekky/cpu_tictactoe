@@ -23,6 +23,7 @@ func Serve() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/hello", Hello_handler)
+	mux.HandleFunc("/validate", Validate_handler)
 	mux.HandleFunc("/place", Place_handler)
 	mux.HandleFunc("/has_won", Has_won_handler)
 	mux.HandleFunc("/game_over", Game_over_handler)
