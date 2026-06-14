@@ -16,5 +16,9 @@ export const mark_spot = async (row, col, isXTurn) => {
     return {
         row: body.row,
         col: body.col,
+        game_over: body.game_over,
+        has_won: body.has_won,
+        success: body.success,
+        errMsg: body.errMsg
     }
 }
