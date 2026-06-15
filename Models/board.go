@@ -53,3 +53,11 @@ func (board *Board) Print_Board() {
 		string(board.Board[2][:]),
 	)
 }
+
+func (board *Board) Restart() {
+	log.Println("Restarting game")
+	game.Restart(&board.Board, &board.X_turn)
+
+	board.Print_Board()
+	log.Println(board.X_turn)
+}

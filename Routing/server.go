@@ -11,6 +11,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("content-type", "application/json")
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
@@ -27,6 +28,7 @@ func Serve() {
 	mux.HandleFunc("/place", Place_handler)
 	mux.HandleFunc("/has_won", Has_won_handler)
 	mux.HandleFunc("/game_over", Game_over_handler)
+	mux.HandleFunc("/restart", Restart_handler)
 
 	handler := corsMiddleware(mux)
 

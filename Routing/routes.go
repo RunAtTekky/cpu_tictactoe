@@ -2,7 +2,6 @@ package routing
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -12,12 +11,13 @@ import (
 )
 
 func Hello_handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World\n")
+	res := &models.GameResponse{
+		Success: true,
+	}
+	json.NewEncoder(w).Encode(res)
 }
 
 func Validate_handler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
-
 	var req models.Request
 	json.NewDecoder(r.Body).Decode(&req)
 	internal.Print_request(req)
@@ -30,7 +30,6 @@ func Validate_handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func Place_handler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
 	var req models.Request
 	json.NewDecoder(r.Body).Decode(&req)
 	internal.Print_request(req)
@@ -70,7 +69,6 @@ func Place_handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func Has_won_handler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
 	if game.Check_winner(&models.Board_IN_use.Board) {
 		res := &models.GameResponse{
 			Success: true,
@@ -89,7 +87,6 @@ func Has_won_handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func Game_over_handler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
 	if game.Is_game_over(&models.Board_IN_use.Board) {
 		res := &models.GameResponse{
 			Success:  true,
@@ -103,4 +100,8 @@ func Game_over_handler(w http.ResponseWriter, r *http.Request) {
 		}
 		json.NewEncoder(w).Encode(res)
 	}
+}
+
+func Restart_handler(w http.ResponseWriter, r *http.Request) {
+	models.Board_IN_use.Restart()
 }
