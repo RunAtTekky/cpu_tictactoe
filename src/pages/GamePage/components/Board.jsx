@@ -47,7 +47,6 @@ export const Board = () => {
     newCells[idx] = xTurn ? BOARD.X_SYMBOL : BOARD.O_SYMBOL;
 
     if (game_over) {
-      setXTurn(!xTurn);
       declareResult(has_won);
 
       if (has_won) {
@@ -78,7 +77,7 @@ export const Board = () => {
     alert("Restarted");
 
     setCells(Array(9).fill(BOARD.EMPTY));
-    setXTurn(!xTurn);
+    setXTurn(xTurn => !xTurn);
   }
 
   const cellsBtn = cells.map((cell, idx) => (
