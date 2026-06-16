@@ -3,9 +3,9 @@ import { BOARD } from "../../../constants";
 
 import "./Board.css";
 import { Cell } from "./Cell";
-import { mark_spot, restart_game } from "../GamePage.services";
+import { gameApi } from "../GamePage.services";
 import { getIdx, getInitialBoard, getResultMessage, getRowCol } from "../GamePage.helpers";
-import { validatePlacement } from "../GamePage.actions";
+import { validatePlacementAction } from "../GamePage.actions";
 
 export const Board = () => {
   const [cells, setCells] = useState(getInitialBoard(BOARD.EMPTY, 9));
@@ -19,7 +19,7 @@ export const Board = () => {
 
     // Server side check
     const { row: userRow, col: userCol } = getRowCol(idx);
-    let canPlace = await validatePlacement(userRow, userCol, xTurn);
+    let canPlace = await validatePlacementAction(userRow, userCol, xTurn);
     if (!canPlace) {
       return;
     }
@@ -29,7 +29,7 @@ export const Board = () => {
       col: ai_col,
       game_over,
       has_won,
-    } = await mark_spot(userRow, userCol, xTurn);
+    } = await gameApi.placeMarkApi(userRow, userCol, xTurn);
 
     newCells[idx] = xTurn ? BOARD.X_SYMBOL : BOARD.O_SYMBOL;
 
@@ -53,7 +53,7 @@ export const Board = () => {
   };
 
   const restartGame = async () => {
-    const { success: restarted } = await restart_game();
+    const { success: restarted } = await gameApi.restart_game();
 
     if (!restarted) return;
 
@@ -61,6 +61,7 @@ export const Board = () => {
 
     setCells(getInitialBoard(BOARD.EMPTY, 9));
     setXTurn(xTurn => !xTurn);
+    setResult("");
   }
 
   const cellsBtn = cells.map((cell, idx) => (

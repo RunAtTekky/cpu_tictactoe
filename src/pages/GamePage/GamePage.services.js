@@ -16,7 +16,7 @@ export const gameApi = {
     return await response.json();
   },
 
-  validate_placement: async (row, col, isXTurn) => {
+  validatePlacement: async (row, col, isXTurn) => {
     const response = await fetch(API.BASE_URL + API.VALIDATE, {
       method: "POST",
       headers: CONTENT_TYPE,
