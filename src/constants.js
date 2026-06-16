@@ -16,3 +16,9 @@ export const API = {
 export const CONTENT_TYPE = {
     'Content-Type': 'application/json'
 }
+
+export const CUSTOM_ACTIONS = {
+    CELL_CLICK: 'CELL_CLICK',
+    DECLARE_RESULT: 'DECLARE_RESULT',
+    RESTART_GAME: 'RESTART_GAME',
+}

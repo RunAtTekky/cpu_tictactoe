@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { BOARD } from "../../../constants";
+import { BOARD, CUSTOM_ACTIONS } from "../../../constants";
 
 import "./Board.css";
 import { Cell } from "./Cell";
 import { gameApi } from "../GamePage.services";
 import { getIdx, getInitialBoard, getResultMessage, getRowCol } from "../GamePage.helpers";
 import { validatePlacementAction } from "../GamePage.actions";
+import { ACTION_HANDLERS } from "../GamePage.actionHandlers";
 
 export const Board = () => {
   const [cells, setCells] = useState(getInitialBoard(BOARD.EMPTY, 9));
@@ -34,7 +35,7 @@ export const Board = () => {
     newCells[idx] = xTurn ? BOARD.X_SYMBOL : BOARD.O_SYMBOL;
 
     if (game_over) {
-      declareResult(has_won);
+      onDeclareResult(has_won);
 
       if (has_won) {
         const ai_idx = getIdx(ai_row, ai_col);
@@ -48,9 +49,9 @@ export const Board = () => {
     setCells(newCells);
   };
 
-  const declareResult = (has_won) => {
-    setResult(getResultMessage(has_won));
-  };
+  const onDeclareResult = (has_won) => {
+    ACTION_HANDLERS[CUSTOM_ACTIONS.DECLARE_RESULT](has_won, setResult, getResultMessage);
+  }
 
   const restartGame = async () => {
     const { success: restarted } = await gameApi.restart_game();
