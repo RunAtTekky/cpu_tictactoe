@@ -3,25 +3,12 @@ import { BOARD } from "../../../constants";
 
 import "./Board.css";
 import { Cell } from "./Cell";
-import { mark_spot, restart_game, validate_placement } from "../GamePage.services";
-
-const getRowCol = (idx) => {
-  const row = Math.trunc(idx / 3);
-  const col = idx % 3;
-
-  return {
-    row,
-    col,
-  };
-};
-
-const getIdx = (row, col) => {
-  const idx = row * 3 + col;
-  return idx;
-};
+import { mark_spot, restart_game } from "../GamePage.services";
+import { getIdx, getInitialBoard, getRowCol } from "../GamePage.helpers";
+import { validatePlacement } from "../GamePage.actions";
 
 export const Board = () => {
-  const [cells, setCells] = useState(Array(9).fill(BOARD.EMPTY));
+  const [cells, setCells] = useState(getInitialBoard(BOARD.EMPTY, 9));
   const [xTurn, setXTurn] = useState(true);
   const [result, setResult] = useState("");
 
@@ -76,7 +63,7 @@ export const Board = () => {
 
     alert("Restarted");
 
-    setCells(Array(9).fill(BOARD.EMPTY));
+    setCells(getInitialBoard(BOARD.EMPTY, 9));
     setXTurn(xTurn => !xTurn);
   }
 
@@ -92,9 +79,4 @@ export const Board = () => {
       <button onClick={restartGame}>Restart</button>
     </>
   );
-};
-
-const validatePlacement = async (row, col, isXturn) => {
-  const { canPlace } = await validate_placement(row, col, isXturn);
-  return canPlace;
 };
