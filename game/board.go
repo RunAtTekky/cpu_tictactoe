@@ -152,7 +152,7 @@ func Get_new_state(board *Board, move Move, is_x_turn bool) Board {
 }
 
 func Restart(board *Board, is_x_turn *bool) {
-	board = &Board{
+	*board = Board{
 		{'$', '$', '$'},
 		{'$', '$', '$'},
 		{'$', '$', '$'},

@@ -104,4 +104,8 @@ func Game_over_handler(w http.ResponseWriter, r *http.Request) {
 
 func Restart_handler(w http.ResponseWriter, r *http.Request) {
 	models.Board_IN_use.Restart()
+	res := &models.GameResponse{
+		Success: true,
+	}
+	json.NewEncoder(w).Encode(res)
 }
