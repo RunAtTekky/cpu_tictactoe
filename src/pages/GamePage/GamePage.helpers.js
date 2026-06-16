@@ -15,12 +15,12 @@ export const getIdx = (row, col) => {
 
 export const isCellEmpty = (cell, EMPTY_VALUE) => {
   return cell === EMPTY_VALUE;
-}
+};
 
 export const getInitialBoard = (EMPTY_VALUE, size = 9) => {
   return Array(size).fill(EMPTY_VALUE);
-}
+};
 
 export const getResultMessage = (hasWon) => {
   return hasWon ? "CPU has won" : "DRAW";
-}
+};
