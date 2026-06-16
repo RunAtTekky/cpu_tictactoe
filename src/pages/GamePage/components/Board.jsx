@@ -4,7 +4,7 @@ import { BOARD } from "../../../constants";
 import "./Board.css";
 import { Cell } from "./Cell";
 import { mark_spot, restart_game } from "../GamePage.services";
-import { getIdx, getInitialBoard, getRowCol } from "../GamePage.helpers";
+import { getIdx, getInitialBoard, getResultMessage, getRowCol } from "../GamePage.helpers";
 import { validatePlacement } from "../GamePage.actions";
 
 export const Board = () => {
@@ -49,11 +49,7 @@ export const Board = () => {
   };
 
   const declareResult = (has_won) => {
-    if (has_won) {
-      setResult("CPU has won");
-    } else {
-      setResult("Draw");
-    }
+    setResult(getResultMessage(has_won));
   };
 
   const restartGame = async () => {
