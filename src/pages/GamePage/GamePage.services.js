@@ -1,8 +1,9 @@
-import { API } from "../../constants"
+import { API, CONTENT_TYPE } from "../../constants"
 
 export const mark_spot = async (row, col, isXTurn) => {
     const response = await fetch(API.BASE_URL + API.PLACE, {
         method: "POST",
+        headers: CONTENT_TYPE,
         body: JSON.stringify({
             row: row,
             col: col,
@@ -26,6 +27,7 @@ export const mark_spot = async (row, col, isXTurn) => {
 export const validate_placement = async (row, col, isXTurn) => {
     const response = await fetch(API.BASE_URL + API.VALIDATE, {
         method: "POST",
+        headers: CONTENT_TYPE,
         body: JSON.stringify({
             row: row,
             col: col,
@@ -38,5 +40,20 @@ export const validate_placement = async (row, col, isXTurn) => {
 
     return {
         canPlace: body.can_place,
+    }
+}
+
+export const restart_game = async () => {
+    const response = await fetch(API.BASE_URL + API.RESTART, {
+        method: "GET",
+        headers: CONTENT_TYPE,
+    });
+
+    if (!response.ok) return;
+    
+    const body = await response.json();
+
+    return {
+        success: body.success
     }
 }

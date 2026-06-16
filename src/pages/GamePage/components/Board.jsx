@@ -3,7 +3,7 @@ import { BOARD } from "../../../constants";
 
 import "./Board.css";
 import { Cell } from "./Cell";
-import { mark_spot, validate_placement } from "../GamePage.services";
+import { mark_spot, restart_game, validate_placement } from "../GamePage.services";
 
 const getRowCol = (idx) => {
   const row = Math.trunc(idx / 3);
@@ -70,6 +70,17 @@ export const Board = () => {
     }
   };
 
+  const restartGame = async () => {
+    const { success: restarted } = await restart_game();
+
+    if (!restarted) return;
+
+    alert("Restarted");
+
+    setCells(Array(9).fill(BOARD.EMPTY));
+    setXTurn(!xTurn);
+  }
+
   const cellsBtn = cells.map((cell, idx) => (
     <Cell key={idx} value={cell} onClick={handleCellClick} idx={idx} />
   ));
@@ -79,6 +90,7 @@ export const Board = () => {
       <h1 className="heading">AI TicTacToe</h1>
       <div className="board">{cellsBtn}</div>
       <div className="result">Result: {result}</div>
+      <button onClick={restartGame}>Restart</button>
     </>
   );
 };

@@ -9,5 +9,10 @@ export const API = {
     PLACE: "/place",
     HAS_WON: "/has_won",
     GAME_OVER: "/game_over",
-    VALIDATE: "/validate"
+    VALIDATE: "/validate",
+    RESTART: "/restart",
+}
+
+export const CONTENT_TYPE = {
+    'Content-Type': 'application/json'
 }
