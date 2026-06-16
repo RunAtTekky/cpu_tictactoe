@@ -49,11 +49,11 @@ func Place_handler(w http.ResponseWriter, r *http.Request) {
 	models.Board_IN_use.Print_Board()
 
 	board := models.Board_IN_use
-	best_move := game.Minimax(board.Board, board.X_turn, board.Depth)
+	best_move := game.Minimax(board.Board, !board.Client_is_X, board.Depth)
 	log.Printf("Best move %v\n", best_move)
 
 	// Make the move from AI side
-	models.Board_IN_use.Insert(best_move.Move.Row, best_move.Move.Col, board.X_turn)
+	models.Board_IN_use.Insert(best_move.Move.Row, best_move.Move.Col, !board.Client_is_X)
 	models.Board_IN_use.Print_Board()
 
 	res := &models.GameResponse{

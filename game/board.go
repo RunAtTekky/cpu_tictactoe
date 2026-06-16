@@ -157,6 +157,4 @@ func Restart(board *Board, is_x_turn *bool) {
 		{'$', '$', '$'},
 		{'$', '$', '$'},
 	}
-
-	*is_x_turn = !*is_x_turn
 }

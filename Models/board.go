@@ -7,10 +7,10 @@ import (
 )
 
 type Board struct {
-	Board     game.Board `json:"board"`
-	X_turn    bool       `json:"x_turn"`
-	Game_over bool       `json:"game_over"`
-	Depth     int        `json:"depth"`
+	Board       game.Board `json:"board"`
+	Client_is_X bool       `json:"x_turn"`
+	Game_over   bool       `json:"game_over"`
+	Depth       int        `json:"depth"`
 }
 
 var Board_IN_use Board = Board{
@@ -19,9 +19,9 @@ var Board_IN_use Board = Board{
 		{'$', '$', '$'},
 		{'$', '$', '$'},
 	},
-	X_turn:    true,
-	Game_over: false,
-	Depth:     0,
+	Client_is_X: true,
+	Game_over:   false,
+	Depth:       0,
 }
 
 var EMPTY = '$'
@@ -41,8 +41,6 @@ func (board *Board) Insert(row, col int, x_turn bool) bool {
 		board.Board[row][col] = 'O'
 	}
 
-	board.X_turn = !board.X_turn
-
 	return true
 }
 
@@ -56,8 +54,10 @@ func (board *Board) Print_Board() {
 
 func (board *Board) Restart() {
 	log.Println("Restarting game")
-	game.Restart(&board.Board, &board.X_turn)
+	game.Restart(&board.Board, &board.Client_is_X)
 
 	board.Print_Board()
-	log.Println(board.X_turn)
+	board.Client_is_X = !board.Client_is_X
+
+	log.Printf("Client turn is X: %t\n", board.Client_is_X)
 }
