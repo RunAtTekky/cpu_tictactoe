@@ -3,7 +3,7 @@ import { BOARD, CUSTOM_ACTIONS } from "../../../constants";
 
 import "./Board.css";
 import { Cell } from "./Cell";
-import { getInitialBoard, getResultMessage } from "../GamePage.helpers";
+import { getInitialBoard, getResultMessage, getWinningHighlights } from "../GamePage.helpers";
 import { ACTION_HANDLERS } from "../GamePage.actionHandlers";
 
 export const Board = () => {
@@ -23,9 +23,15 @@ export const Board = () => {
     ACTION_HANDLERS[CUSTOM_ACTIONS.RESTART_GAME](setCells, setXTurn, setResult);
   }
 
-  const cellsBtn = cells.map((cell, idx) => (
-    <Cell key={idx} value={cell} onClick={onCellClick} idx={idx} />
-  ));
+  const isHighlighted = getWinningHighlights(cells);
+
+  const cellsBtn = cells.map((cell, idx) => {
+    if (result !== "" && isHighlighted[idx]) {
+      return <Cell key={idx} value={cell} onClick={onCellClick} idx={idx} color={"red"} />
+    } else {
+      return <Cell key={idx} value={cell} onClick={onCellClick} idx={idx} color={"black"} />
+    }
+  });
 
   return (
     <>
