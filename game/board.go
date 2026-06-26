@@ -15,6 +15,10 @@ type BestMove struct {
 	Score int
 }
 
+func CanPlace(board *Board, row, col int) bool {
+	return board[row][col] == EMPTY
+}
+
 func Get_available_moves(board *Board) []Move {
 	var moves []Move
 
@@ -145,4 +149,12 @@ func Get_new_state(board *Board, move Move, is_x_turn bool) Board {
 	}
 
 	return new_state
+}
+
+func Restart(board *Board, is_x_turn *bool) {
+	*board = Board{
+		{'$', '$', '$'},
+		{'$', '$', '$'},
+		{'$', '$', '$'},
+	}
 }

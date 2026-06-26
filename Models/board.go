@@ -1,28 +1,36 @@
 package models
 
-import "fmt"
+import (
+	"log"
+
+	"github.com/RunAtTekky/backend/game"
+)
 
 type Board struct {
-	Board     [3][3]rune `json:"board"`
-	X_turn    bool       `json:"x_turn"`
-	Game_over bool       `json:"game_over"`
-	Depth     int        `json:"depth"`
+	Board       game.Board `json:"board"`
+	Client_is_X bool       `json:"x_turn"`
+	Game_over   bool       `json:"game_over"`
+	Depth       int        `json:"depth"`
 }
 
 var Board_IN_use Board = Board{
-	Board: [3][3]rune{
+	Board: game.Board{
 		{'$', '$', '$'},
 		{'$', '$', '$'},
 		{'$', '$', '$'},
 	},
-	X_turn:    true,
-	Game_over: false,
-	Depth:     0,
+	Client_is_X: true,
+	Game_over:   false,
+	Depth:       0,
 }
 
 var EMPTY = '$'
 
 func (board *Board) Insert(row, col int, x_turn bool) bool {
+	if game.Is_game_over(&board.Board) {
+		return false
+	}
+
 	if board.Board[row][col] != EMPTY {
 		return false
 	}
@@ -33,15 +41,23 @@ func (board *Board) Insert(row, col int, x_turn bool) bool {
 		board.Board[row][col] = 'O'
 	}
 
-	board.X_turn = !board.X_turn
-
 	return true
 }
 
 func (board *Board) Print_Board() {
-	for row := 0; row < 3; row++ {
-		fmt.Println(string(board.Board[row][0]), string(board.Board[row][1]), string(board.Board[row][2]))
-	}
+	log.Printf("Board:\n%s\n%s\n%s\n",
+		string(board.Board[0][:]),
+		string(board.Board[1][:]),
+		string(board.Board[2][:]),
+	)
+}
 
-	fmt.Println()
+func (board *Board) Restart() {
+	log.Println("Restarting game")
+	game.Restart(&board.Board, &board.Client_is_X)
+
+	board.Print_Board()
+	board.Client_is_X = !board.Client_is_X
+
+	log.Printf("Client turn is X: %t\n", board.Client_is_X)
 }

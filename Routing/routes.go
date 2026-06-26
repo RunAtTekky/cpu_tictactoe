@@ -2,42 +2,110 @@ package routing
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 
+	internal "github.com/RunAtTekky/backend/Internal"
 	models "github.com/RunAtTekky/backend/Models"
 	"github.com/RunAtTekky/backend/game"
 )
 
 func Hello_handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World\n")
+	res := &models.GameResponse{
+		Success: true,
+	}
+	json.NewEncoder(w).Encode(res)
+}
 
+func Validate_handler(w http.ResponseWriter, r *http.Request) {
+	var req models.Request
+	json.NewDecoder(r.Body).Decode(&req)
+	internal.Print_request(req)
+
+	res := &models.ValidateResponse{
+		CanPlace: game.CanPlace(&models.Board_IN_use.Board, req.Row, req.Col),
+	}
+
+	json.NewEncoder(w).Encode(res)
 }
 
 func Place_handler(w http.ResponseWriter, r *http.Request) {
 	var req models.Request
 	json.NewDecoder(r.Body).Decode(&req)
+	internal.Print_request(req)
 
-	fmt.Printf(`You passed this data:
-ROW: %d
-COL: %d
-TURN: %t
-`, req.Row, req.Col, req.X_turn)
+	inserted := models.Board_IN_use.Insert(req.Row, req.Col, req.X_turn)
+	if !inserted {
+		res := &models.GameResponse{
+			Success:  false,
+			ErrorMsg: "FAILED! Already present!",
+		}
 
-	models.Board_IN_use.Print_Board()
-	if !models.Board_IN_use.Insert(req.Row, req.Col, req.X_turn) {
-		fmt.Fprintf(w, "FAILED! Already present!\n")
+		json.NewEncoder(w).Encode(res)
 		return
 	}
 
-	fmt.Fprintf(w, "Success!\n")
+	// Print board after insertion
 	models.Board_IN_use.Print_Board()
 
 	board := models.Board_IN_use
+	best_move := game.Minimax(board.Board, !board.Client_is_X, board.Depth)
+	log.Printf("Best move %v\n", best_move)
 
-	best_move := game.Minimax(board.Board, board.X_turn, board.Depth)
-	fmt.Println(best_move)
-
-	models.Board_IN_use.Insert(best_move.Move.Row, best_move.Move.Col, board.X_turn)
+	// Make the move from AI side
+	models.Board_IN_use.Insert(best_move.Move.Row, best_move.Move.Col, !board.Client_is_X)
 	models.Board_IN_use.Print_Board()
+
+	res := &models.GameResponse{
+		Row:      best_move.Move.Row,
+		Col:      best_move.Move.Col,
+		GameOver: game.Is_game_over(&models.Board_IN_use.Board),
+		HasWon:   game.Check_winner(&models.Board_IN_use.Board),
+		Success:  true,
+		ErrorMsg: "",
+	}
+
+	json.NewEncoder(w).Encode(res)
+}
+
+func Has_won_handler(w http.ResponseWriter, r *http.Request) {
+	if game.Check_winner(&models.Board_IN_use.Board) {
+		res := &models.GameResponse{
+			Success: true,
+			HasWon:  true,
+		}
+
+		json.NewEncoder(w).Encode(res)
+	} else {
+		res := &models.GameResponse{
+			Success: true,
+			HasWon:  false,
+		}
+
+		json.NewEncoder(w).Encode(res)
+	}
+}
+
+func Game_over_handler(w http.ResponseWriter, r *http.Request) {
+	if game.Is_game_over(&models.Board_IN_use.Board) {
+		res := &models.GameResponse{
+			Success:  true,
+			GameOver: true,
+		}
+		json.NewEncoder(w).Encode(res)
+	} else {
+		res := &models.GameResponse{
+			Success:  true,
+			GameOver: false,
+		}
+		json.NewEncoder(w).Encode(res)
+	}
+}
+
+func Restart_handler(w http.ResponseWriter, r *http.Request) {
+	models.Board_IN_use.Restart()
+	res := &models.GameResponse{
+		Success: true,
+	}
+	json.NewEncoder(w).Encode(res)
 }
