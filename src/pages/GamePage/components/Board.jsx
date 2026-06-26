@@ -27,7 +27,6 @@ export const Board = () => {
 
   const cellsBtn = cells.map((cell, idx) => {
     if (result !== "" && isHighlighted[idx]) {
-      console.log("Printing red");
       return <Cell key={idx} value={cell} onClick={onCellClick} idx={idx} color={"red"} />
     } else {
       return <Cell key={idx} value={cell} onClick={onCellClick} idx={idx} color={"black"} />

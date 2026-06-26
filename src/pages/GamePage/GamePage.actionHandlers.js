@@ -56,8 +56,6 @@ const handleRestartGame = async (setCells, setXTurn, setResult) => {
 
   if (!restarted) return;
 
-  alert("Restarted");
-
   setCells(getInitialBoard(BOARD.EMPTY, 9));
   setXTurn(xTurn => !xTurn);
   setResult("");
