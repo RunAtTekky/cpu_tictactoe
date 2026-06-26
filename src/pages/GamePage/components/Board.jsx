@@ -12,7 +12,7 @@ export const Board = () => {
   const [result, setResult] = useState("");
 
   const onCellClick = async (idx) => {
-    ACTION_HANDLERS[CUSTOM_ACTIONS.CELL_CLICK](idx, cells, setCells, xTurn, onDeclareResult);
+    ACTION_HANDLERS[CUSTOM_ACTIONS.CELL_CLICK](idx, cells, setCells, xTurn, onDeclareResult, result);
   }
 
   const onDeclareResult = (has_won) => {

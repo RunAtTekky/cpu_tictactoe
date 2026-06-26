@@ -13,10 +13,12 @@ const handleCellClick = async (
   setCells,
   xTurn,
   onDeclareResult,
+  result,
 ) => {
   // Client side check
   const newCells = cells.slice();
   if (newCells[idx] != BOARD.EMPTY) return;
+  if (result !== "") return;
 
   // Server side check
   const { row: userRow, col: userCol } = getRowCol(idx);
